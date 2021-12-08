@@ -1,5 +1,9 @@
-class ReflectionHelper {
-	@teste(value="teste")
+package swagger.automate;
+
+import swagger.automate.annotation.Requerido;
+
+public class ReflectionHelper {
+	@Requerido(true)
 	private int age;
 	private String name;
 	public String deptName;
