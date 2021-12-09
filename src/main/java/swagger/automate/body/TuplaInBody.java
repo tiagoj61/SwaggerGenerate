@@ -1,8 +1,10 @@
 package swagger.automate.body;
 
+import java.lang.reflect.Type;
+
 public class TuplaInBody {
 	private String name;
-	private String type;
+	private Type type;
 	private boolean required;
 	private String example;
 
@@ -14,11 +16,11 @@ public class TuplaInBody {
 		this.name = name;
 	}
 
-	public String getType() {
+	public Type getType() {
 		return type;
 	}
 
-	public void setType(String type) {
+	public void setType(Type type) {
 		this.type = type;
 	}
 

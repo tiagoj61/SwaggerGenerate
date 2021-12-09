@@ -31,6 +31,7 @@ import swagger.automate.constants.DocConstants;
 import swagger.automate.doc.DocText;
 import swagger.automate.operationutil.ReflectionUtil;
 import swagger.automate.operationutil.TextUtil;
+import swagger.automate.operationutil.TypeUtil;
 import swagger.automate.path.PathData;
 import swagger.automate.response.Responses;
 import swagger.automate.tag.Tag;
@@ -85,7 +86,14 @@ public class ReflectionDemo {
 						if (annotationOfImplemented instanceof POST) {
 							pathData.setMethod("POST");
 							for (Parameter consume : privateInterfaceMethod.getParameters()) {
+								if (objects.entrySet().stream()
+										.filter(value -> value.getValue().getType() == consume.getType()).findAny()
+										.orElse(null) != null) {
+									continue;
+								}
 								BodyObject bodyObject = new BodyObject();
+								bodyObject.setNome(consume.getType().getSimpleName());
+								bodyObject.setType(consume.getType());
 								for (Field field : consume.getType().getDeclaredFields()) {
 
 									TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(field);
@@ -96,7 +104,7 @@ public class ReflectionDemo {
 												continue;
 											}
 										}
-										
+
 									}
 									bodyObject.getTuplaInBodies().add(tuplaInBody);
 								}
@@ -152,7 +160,14 @@ public class ReflectionDemo {
 						 */
 						if (annotationOfInterface instanceof Return) {
 							Field[] fileds = ((Return) annotationOfInterface).value().getDeclaredFields();
+							if (objects.entrySet().stream().filter(
+									value -> value.getValue().getType() == ((Return) annotationOfInterface).value())
+									.findAny().orElse(null) != null) {
+								continue;
+							}
 							BodyObject bodyObject = new BodyObject();
+							bodyObject.setNome(((Return) annotationOfInterface).value().getSimpleName());
+							bodyObject.setType(((Return) annotationOfInterface).value());
 							for (Field field : fileds) {
 
 								TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(field);
@@ -245,10 +260,12 @@ public class ReflectionDemo {
 			// paths.append(TextUtil.replicateString(DocConstants.SPACE, 5)).append("$ref:
 			// \"#/definitions/"+objects.get(pathData.getConsumesBodyKey())+"\"").append("\n");//
 			// TODO: define the name
-			paths.append(TextUtil.replicateString(DocConstants.SPACE, 5)).append("$ref: \"#/definitions/Funcionario\"")
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 5))
+					.append("$ref: \"#/definitions/" + objects.get(pathData.getProducesBodyKey()).getNome() + "\"")
 					.append("\n");// TODO: define the name
 
 			paths.append(TextUtil.replicateString(DocConstants.SPACE, 3)).append("responses:").append("\n");
+
 			Arrays.stream(pathData.getResponses().getResponses()).forEach(response -> {
 				paths.append(TextUtil.replicateString(DocConstants.SPACE, 4)).append("\"" + response + "\":")
 						.append("\n");
@@ -262,10 +279,11 @@ public class ReflectionDemo {
 
 		StringBuilder definitions = new StringBuilder("definitions:").append("\n");
 		objects.forEach((key, value) -> {
-			definitions.append(TextUtil.replicateString(DocConstants.SPACE, 1)).append("Funcionario:").append("\n");// TODO:
-																													// define
-																													// the
-																													// name
+			definitions.append(TextUtil.replicateString(DocConstants.SPACE, 1)).append(value.getNome()).append(":")
+					.append("\n");// TODO:
+			// define
+			// the
+			// name
 			definitions.append(TextUtil.replicateString(DocConstants.SPACE, 2)).append("type: \"object\"").append("\n");// type
 			definitions.append(TextUtil.replicateString(DocConstants.SPACE, 2)).append("required:").append("\n");// Required
 
@@ -279,9 +297,10 @@ public class ReflectionDemo {
 				definitions.append(TextUtil.replicateString(DocConstants.SPACE, 3)).append("" + tuple.getName() + ":")
 						.append("\n");// Fields
 				definitions.append(TextUtil.replicateString(DocConstants.SPACE, 4)).append("type: ")
-						.append("\"" + tuple.getType() + "\"").append("\n");// Fields
+						.append("\"" + TypeUtil.convertTypeToJson(tuple.getType()) + "\"").append("\n");// Fields
+
 				definitions.append(TextUtil.replicateString(DocConstants.SPACE, 4)).append("example: ")
-						.append("\"" + tuple.getExample() + "\"").append("\n");// Fields
+						.append(tuple.getExample()).append("\n");// Fields
 			});
 		});
 		docText.setDefinitions(definitions);
