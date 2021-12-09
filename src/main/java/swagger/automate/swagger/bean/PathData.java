@@ -1,11 +1,7 @@
-package swagger.automate.path;
+package swagger.automate.swagger.bean;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import swagger.automate.body.BodyObject;
-import swagger.automate.response.Responses;
-import swagger.automate.tag.Tag;
 
 public class PathData {
 	private int tagKey;

@@ -1,4 +1,4 @@
-package swagger.automate.doc;
+package swagger.automate.doc.bean;
 
 public class DocText {
 	private StringBuilder header;

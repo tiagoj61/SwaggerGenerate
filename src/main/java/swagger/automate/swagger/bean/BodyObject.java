@@ -1,4 +1,4 @@
-package swagger.automate.body;
+package swagger.automate.swagger.bean;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;

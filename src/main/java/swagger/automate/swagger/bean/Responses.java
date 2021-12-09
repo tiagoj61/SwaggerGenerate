@@ -1,4 +1,4 @@
-package swagger.automate.response;
+package swagger.automate.swagger.bean;
 
 import java.util.List;
 

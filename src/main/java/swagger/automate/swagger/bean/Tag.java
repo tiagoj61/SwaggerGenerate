@@ -1,4 +1,4 @@
-package swagger.automate.tag;
+package swagger.automate.swagger.bean;
 
 public class Tag {
 	private String name;

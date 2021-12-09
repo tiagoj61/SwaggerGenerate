@@ -4,10 +4,10 @@ import javax.ws.rs.core.Response;
 
 import org.springframework.context.annotation.Description;
 
+import swagger.automate.ReflectionHelper;
 import swagger.automate.annotation.Return;
 import swagger.automate.annotation.Returns;
 import swagger.automate.annotation.Tag;
-import swagger.automate.bean.ReflectionHelper;
 
 public interface RestTesteInterface {
 	

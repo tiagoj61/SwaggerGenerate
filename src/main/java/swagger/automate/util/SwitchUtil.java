@@ -1,10 +1,10 @@
-package swagger.automate.operationutil;
+package swagger.automate.util;
 
 import java.lang.reflect.Type;
 
 import swagger.automate.enumeration.Classes;
 
-public class TypeUtil {
+public class SwitchUtil {
 	public static String convertTypeToJson(Type type) {
 		switch (Classes.fromClass(type)) {
 		case INT:
