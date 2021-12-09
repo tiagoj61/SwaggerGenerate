@@ -1,5 +1,6 @@
 package swagger.automate.path;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import swagger.automate.body.BodyObject;
@@ -7,21 +8,21 @@ import swagger.automate.response.Responses;
 import swagger.automate.tag.Tag;
 
 public class PathData {
-	private Tag tag;
+	private int tagKey;
 	private String path;
 	private String method;
 	private String consumes;
 	private String produces;
 	private Responses responses;
-	private List<BodyObject> consumesBody;
-	private List<BodyObject> producesBody;
+	private int consumesBodyKey;
+	private int producesBodyKey;
 
-	public Tag getTag() {
-		return tag;
+	public int getTagKey() {
+		return tagKey;
 	}
 
-	public void setTag(Tag tag) {
-		this.tag = tag;
+	public void setTagKey(int tagKey) {
+		this.tagKey = tagKey;
 	}
 
 	public String getPath() {
@@ -64,20 +65,20 @@ public class PathData {
 		this.responses = responses;
 	}
 
-	public List<BodyObject> getConsumesBody() {
-		return consumesBody;
+	public int getConsumesBodyKey() {
+		return consumesBodyKey;
 	}
 
-	public void setConsumesBody(List<BodyObject> consumesBody) {
-		this.consumesBody = consumesBody;
+	public void setConsumesBodyKey(int consumesBodyKey) {
+		this.consumesBodyKey = consumesBodyKey;
 	}
 
-	public List<BodyObject> getProducesBody() {
-		return producesBody;
+	public int getProducesBodyKey() {
+		return producesBodyKey;
 	}
 
-	public void setProducesBody(List<BodyObject> producesBody) {
-		this.producesBody = producesBody;
+	public void setProducesBodyKey(int producesBodyKey) {
+		this.producesBodyKey = producesBodyKey;
 	}
 
 }

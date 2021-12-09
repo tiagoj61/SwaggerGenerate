@@ -4,6 +4,7 @@ public class TuplaInBody {
 	private String name;
 	private String type;
 	private boolean required;
+	private String example;
 
 	public String getName() {
 		return name;
@@ -27,6 +28,14 @@ public class TuplaInBody {
 
 	public void setRequired(boolean required) {
 		this.required = required;
+	}
+
+	public String getExample() {
+		return example;
+	}
+
+	public void setExample(String example) {
+		this.example = example;
 	}
 
 }

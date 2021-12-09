@@ -1,4 +1,4 @@
-package swagger.automate;
+package swagger.automate.bean;
 
 import swagger.automate.annotation.Requerido;
 

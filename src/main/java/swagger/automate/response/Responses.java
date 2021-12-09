@@ -3,13 +3,13 @@ package swagger.automate.response;
 import java.util.List;
 
 public class Responses {
-	private List<String> responses;
+	private int[] responses;
 
-	public List<String> getResponses() {
+	public int[] getResponses() {
 		return responses;
 	}
 
-	public void setResponses(List<String> responses) {
+	public void setResponses(int[] responses) {
 		this.responses = responses;
 	}
 

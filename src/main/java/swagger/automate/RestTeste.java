@@ -10,15 +10,17 @@ import javax.ws.rs.core.Response;
 
 import org.springframework.stereotype.Component;
 
+import swagger.automate.bean.ReflectionHelper;
+
 @Component
 @Path("/usuario")
 public class RestTeste implements RestTesteInterface {
 
-	@Path("login/{id}")
-	@GET
+	@Path("login")
+	@POST
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response restTeste(Long id) {
+	public Response restTeste(ReflectionHelper obj) {
 		try {
 
 			return Response.ok().build();

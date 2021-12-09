@@ -5,10 +5,10 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import swagger.automate.bean.ReflectionHelper;
+import swagger.automate.constants.ReturnConstants;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface Return {
-	Class<? extends ReflectionHelper> value();
+public @interface Returns {
+	public int[] value() default {200,400,500};
 }

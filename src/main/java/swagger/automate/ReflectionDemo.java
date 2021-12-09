@@ -1,11 +1,16 @@
 package swagger.automate;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -13,14 +18,21 @@ import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.Response;
 
 import org.springframework.context.annotation.Description;
 
 import swagger.automate.annotation.Requerido;
 import swagger.automate.annotation.Return;
+import swagger.automate.annotation.Returns;
 import swagger.automate.body.BodyObject;
 import swagger.automate.body.TuplaInBody;
+import swagger.automate.constants.DocConstants;
+import swagger.automate.doc.DocText;
+import swagger.automate.operationutil.ReflectionUtil;
+import swagger.automate.operationutil.TextUtil;
 import swagger.automate.path.PathData;
+import swagger.automate.response.Responses;
 import swagger.automate.tag.Tag;
 
 public class ReflectionDemo {
@@ -29,246 +41,251 @@ public class ReflectionDemo {
 
 		System.gc();
 
+		/*
+		 * Itereate in package rest
+		 */
 		Class<RestTeste> ReflectionHelperclass = RestTeste.class;
 
 		List<PathData> pathDatas = new ArrayList<>();
+		HashMap<Integer, BodyObject> objects = new HashMap<>();
+		HashMap<Integer, Tag> tags = new HashMap<>();
 
-		Class[] objInterface = ReflectionHelperclass.getInterfaces();
-		for (Class citem : objInterface) {
-			Method[] privatefields = citem.getMethods();
-			for (Method onefield : privatefields) {
+		/*
+		 * Doc text variables
+		 */
+		DocText docText = new DocText();
+
+		Class[] interfaces = ReflectionHelperclass.getInterfaces();
+		for (Class declaredInterface : interfaces) {
+			Method[] privateInterfaceMethods = declaredInterface.getMethods();
+			for (Method privateInterfaceMethod : privateInterfaceMethods) {
 				PathData pathData = new PathData();
-				Method implementd = ReflectionHelperclass.getDeclaredMethod(onefield.getName(),
-						onefield.getParameterTypes());
+				Method implementedMethod = ReflectionHelperclass.getDeclaredMethod(privateInterfaceMethod.getName(),
+						privateInterfaceMethod.getParameterTypes());
 
-				for (Annotation a : implementd.getDeclaredAnnotations()) {
-					if (a != null) {
-						if (a instanceof Path) {
-							System.out.println("-> Path ::: " + ((Path) a).value());
-							pathData.setPath(((Path) a).value());
+				for (Annotation annotationOfImplemented : implementedMethod.getDeclaredAnnotations()) {
+					if (annotationOfImplemented != null) {
+						if (annotationOfImplemented instanceof Path) {
+							pathData.setPath(((Path) annotationOfImplemented).value());
 							continue;
 						}
-						if (a instanceof Consumes) {
-							System.out.println(
-									"-> Consume ::: " + ((Consumes) a).value()[((Consumes) a).value().length - 1]);
-							pathData.setConsumes(((Consumes) a).value()[((Consumes) a).value().length - 1]);
+						if (annotationOfImplemented instanceof Consumes) {
+							pathData.setConsumes(((Consumes) annotationOfImplemented)
+									.value()[((Consumes) annotationOfImplemented).value().length - 1]);
 							continue;
 						}
-						if (a instanceof Produces) {
-							System.out.println(
-									"-> Produces ::: " + ((Produces) a).value()[((Produces) a).value().length - 1]);
-							pathData.setProduces(((Produces) a).value()[((Produces) a).value().length - 1]);
+						if (annotationOfImplemented instanceof Produces) {
+							pathData.setProduces(((Produces) annotationOfImplemented)
+									.value()[((Produces) annotationOfImplemented).value().length - 1]);
 							continue;
 						}
-						if (a instanceof POST) {
-							System.out.println("-> Metodo ::: POST");
+						/*
+						 * Catch the method and parameters
+						 */
+						if (annotationOfImplemented instanceof POST) {
 							pathData.setMethod("POST");
-							List<BodyObject> bodyConsumes = new ArrayList<>();
-							for (Parameter q : onefield.getParameters()) {
+							for (Parameter consume : privateInterfaceMethod.getParameters()) {
 								BodyObject bodyObject = new BodyObject();
-								for (Field q1 : q.getType().getDeclaredFields()) {
-									TuplaInBody tuplaInBody = new TuplaInBody();
-									tuplaInBody.setName(q1.getName());
-									tuplaInBody.setType(q1.getType().getName());
-									System.out.println("-> Body Name :::" + q1.getName());
-									System.out.println("-> Tipo :::" + q1.getType().getName());
-									for (Annotation c : q1.getDeclaredAnnotations()) {
-										if (c != null) {
-											if (c instanceof Requerido) {
-												tuplaInBody.setRequired(((Requerido) c).value());
-												System.out.println("-> Requerido ::: " + ((Requerido) c).value());
+								for (Field field : consume.getType().getDeclaredFields()) {
+
+									TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(field);
+									for (Annotation annotationFiled : field.getDeclaredAnnotations()) {
+										if (annotationFiled != null) {
+											if (annotationFiled instanceof Requerido) {
+												tuplaInBody.setRequired(((Requerido) annotationFiled).value());
 												continue;
 											}
 										}
-										bodyObject.getTuplaInBodies().add(tuplaInBody);
+										
 									}
-									bodyConsumes.add(bodyObject);
+									bodyObject.getTuplaInBodies().add(tuplaInBody);
 								}
-
+								pathData.setConsumesBodyKey(objects.size());
+								objects.put(objects.size(), bodyObject);
 							}
-							pathData.setConsumesBody(bodyConsumes);
 							continue;
-						} else if (a instanceof GET) {
+						} else if (annotationOfImplemented instanceof GET) {
 							pathData.setMethod("GET");
-							System.out.println("-> Metodo ::: GET");
-							List<BodyObject> bodyConsumes = new ArrayList<>();
-							for (Parameter q : onefield.getParameters()) {
-								System.out.println("-> Path Nome :::" + q.getName());
-								System.out.println("-> Tipo :::" + q.getType().getName());
-								TuplaInBody tuplaInBody = new TuplaInBody();
-								tuplaInBody.setName(q.getName());
-								tuplaInBody.setType(q.getType().getName());
-								List<TuplaInBody> t = new ArrayList();
-								t.add(tuplaInBody);
-								BodyObject b = new BodyObject();
-								b.setTuplaInBodies(t);
-								bodyConsumes.add(b);
+							for (Parameter parameter : privateInterfaceMethod.getParameters()) {
+
+								TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(parameter);
+
+								List<TuplaInBody> tuples = new ArrayList();
+								tuples.add(tuplaInBody);
+
+								BodyObject bodyObject = new BodyObject();
+								bodyObject.setTuplaInBodies(tuples);
+
+								pathData.setConsumesBodyKey(objects.size());
+
+								objects.put(objects.size(), bodyObject);
 							}
-							pathData.setConsumesBody(bodyConsumes);
 							continue;
-						} else if (a instanceof PUT) {
+						} else if (annotationOfImplemented instanceof PUT) {
 							pathData.setMethod("PUT");
-							System.out.println("-> Metodo ::: PUT");
 							continue;
 						}
 					}
 
 				}
-				// PathData pathData = new PathData();
 				Tag tag = new Tag();
-				for (Annotation a : onefield.getDeclaredAnnotations()) {
-					if (a != null) {
-						if (a instanceof swagger.automate.annotation.Tag) {
-							System.out.println("-> Tag ::: " + ((swagger.automate.annotation.Tag) a).value());
-							tag.setName(((swagger.automate.annotation.Tag) a).value());
+				for (Annotation annotationOfInterface : privateInterfaceMethod.getDeclaredAnnotations()) {
+					if (annotationOfInterface != null) {
+						if (annotationOfInterface instanceof swagger.automate.annotation.Tag) {
+							tag.setName(((swagger.automate.annotation.Tag) annotationOfInterface).value());
 							continue;
 						}
-						if (a instanceof Description) {
-							System.out.println("-> Description ::: " + ((Description) a).value());
-							tag.setDescription(((Description) a).value());
+						if (annotationOfInterface instanceof Description) {
+							tag.setDescription(((Description) annotationOfInterface).value());
 							continue;
 						}
-						if (a instanceof Return) {
-							List<BodyObject> bodyProduces = new ArrayList<>();
-							Field[] qq = ((Return) a).value().getDeclaredFields();
+						if (annotationOfInterface instanceof Returns) {
+
+							Responses response = new Responses();
+							response.setResponses(((Returns) annotationOfInterface).value());
+
+							pathData.setResponses(response);
+							continue;
+						}
+						/*
+						 * Catch the return
+						 */
+						if (annotationOfInterface instanceof Return) {
+							Field[] fileds = ((Return) annotationOfInterface).value().getDeclaredFields();
 							BodyObject bodyObject = new BodyObject();
-							for (Field q : qq) {
-								TuplaInBody tuplaInBody = new TuplaInBody();
-								tuplaInBody.setName(q.getName());
-								tuplaInBody.setType(q.getType().getName());
-								System.out.println("-> Body Name :::" + q.getName());
-								System.out.println("-> Tipo :::" + q.getType().getName());
-								for (Annotation c : q.getDeclaredAnnotations()) {
-									if (c != null) {
-										if (c instanceof Requerido) {
-											tuplaInBody.setRequired(((Requerido) c).value());
-											System.out.println("-> Requerido ::: " + ((Requerido) c).value());
+							for (Field field : fileds) {
+
+								TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(field);
+
+								for (Annotation annotationOfField : field.getDeclaredAnnotations()) {
+									if (annotationOfField != null) {
+										if (annotationOfField instanceof Requerido) {
+											tuplaInBody.setRequired(((Requerido) annotationOfField).value());
 											continue;
 										}
 									}
 								}
 								bodyObject.getTuplaInBodies().add(tuplaInBody);
 							}
+							pathData.setProducesBodyKey(objects.size());
 
-							bodyProduces.add(bodyObject);
-							pathData.setProducesBody(bodyProduces);
+							objects.put(objects.size(), bodyObject);
 							continue;
 						}
 					}
-					
+
 				}
-				pathData.setTag(tag);
+				pathData.setTagKey(tags.size());
+				tags.put(tags.size(), tag);
 				pathDatas.add(pathData);
 			}
 		}
-		System.out.println(pathDatas.size());
-		System.out.println("swagger: \"2.0\"\r\n" + "info:\r\n"
-				+ "  description: \"Documento referente ao rest do sistema Serquipe\"\r\n" + "  version: \"1.0.0\"\r\n"
-				+ "  title: \"Sequipe rest\"\r\n" + "host: \"serquip.audax.mobi\"\r\n" + "basePath: \"/rest/\"\r\n"
-				+ "tags:");
-		pathDatas.forEach(p -> {
+		StringBuilder header = new StringBuilder("swagger: \"2.0\"").append("\n");
 
-			System.out.println("- name: \"" + p.getTag().getName());
-			System.out.println("  description: \"ADASD\"");
-			System.out.println("schemes:\r\n" + "- \"https\"");
-			System.out.println("paths:");
-			System.out.println("  " + p.getPath() + ":");
-			System.out.println("    " + p.getMethod() + ":");
-			System.out.println("      tags:");
-			System.out.println("      -\"" + p.getTag() + "\"");
-			System.out.println("      description: \"Entrar no sistema\"");
-			System.out.println("      operationId: \"Entrar no sistema\"");
-			System.out.println("      consumes:");
-			System.out.println("      -\"" + p.getConsumes() + "\"");
-			System.out.println("      produces:");
-			System.out.println("      -\"" + p.getProduces() + "\"");
-			System.out.println("      parameters:");
-			System.out.println("      - in: \"body\"\r\n"
-					+ "        name: \"body\"\r\n"
-					+ "        description: \"Dados do usuario\"\r\n"
-					+ "        required: true");
-			System.out.println("      schema:");
-			System.out.println("        $ref: \"#/definitions/Usuario\"");
-			System.out.println("definitions:");
-			System.out.println("  Usuario:");
-			System.out.println("    type: \"object\":");
-			System.out.println("     required:\r\n"
-					+ "    - \"cpf\"\r\n"
-					+ "    - \"senha\"");
-			System.out.println("     properties:");
-			p.getProducesBody().forEach(q->{
-				q.getTuplaInBodies().forEach(q1->{
-					System.out.println("      "+q1.getName());
-					System.out.println("      "+q1.getType());
-				});
-				
+		header.append("info:").append("\n");
+		header.append(TextUtil.replicateString(DocConstants.SPACE, 1))
+				.append("description: \"Documento referente ao rest do sistema Ponto Security\"").append("\n");// TODO:
+																												// define
+																												// the
+																												// desc
+		header.append(TextUtil.replicateString(DocConstants.SPACE, 1)).append("version: \"1.0.0\"").append("\n");// TODO:
+																													// define
+																													// the
+																													// version
+		header.append(TextUtil.replicateString(DocConstants.SPACE, 1)).append("title: \"Ponto Security rest\"")
+				.append("\n");// TODO: define the title
+		header.append("host: \"audax.mobi\"").append("\n");
+		header.append("basePath: \"/rest/\"").append("\n");
+		header.append("tags:").append("\n");
+
+		tags.forEach((key, value) -> {
+			header.append("- name:").append(" \"" + value.getName() + "\"").append("\n");
+			header.append(TextUtil.replicateString(DocConstants.SPACE, 1)).append("description: ")
+					.append("\"" + value.getDescription() + "\"").append("\n");
+		});
+
+		header.append("schemes:").append("\n");
+		header.append("- \"http\"").append("\n");
+		docText.setHeader(header);
+		System.out.println(header);
+
+		StringBuilder paths = new StringBuilder("paths:").append("\n");
+		pathDatas.forEach(pathData -> {
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 1)).append("/").append(pathData.getPath() + ":")
+					.append("\n");
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 2))
+					.append(pathData.getMethod().toLowerCase() + ":").append("\n");
+
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 3)).append("tags:").append("\n");
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 3))
+					.append("- \"" + tags.get(pathData.getTagKey()).getName() + "\"").append("\n");
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 3))
+					.append("summary: \"Loggar com o funcionario\"").append("\n");// TODO:
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 3)).append("description: \"Entrar no sistema\"")
+					.append("\n");// TODO:
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 3)).append("operationId: \"funclogin\"")
+					.append("\n");// TODO:
+
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 3)).append("consumes:").append("\n");
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 3)).append("- \"" + pathData.getConsumes() + "\"")
+					.append("\n");
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 3)).append("produces:").append("\n");
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 3)).append("- \"" + pathData.getProduces() + "\"")
+					.append("\n");
+
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 3)).append("parameters:").append("\n");
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 3))
+					.append("- in: \"" + (pathData.getMethod() == "POST" ? "body" : "path") + "\"").append("\n");
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 4))
+					.append("name: \"" + (pathData.getMethod() == "POST" ? "body" : "path") + "\"").append("\n");
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 4))
+					.append("description: \"Aparelhos bluetooth e senha do funcionario\"").append("\n");
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 4)).append("required: true").append("\n");
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 4)).append("schema:").append("\n");
+			// paths.append(TextUtil.replicateString(DocConstants.SPACE, 5)).append("$ref:
+			// \"#/definitions/"+objects.get(pathData.getConsumesBodyKey())+"\"").append("\n");//
+			// TODO: define the name
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 5)).append("$ref: \"#/definitions/Funcionario\"")
+					.append("\n");// TODO: define the name
+
+			paths.append(TextUtil.replicateString(DocConstants.SPACE, 3)).append("responses:").append("\n");
+			Arrays.stream(pathData.getResponses().getResponses()).forEach(response -> {
+				paths.append(TextUtil.replicateString(DocConstants.SPACE, 4)).append("\"" + response + "\":")
+						.append("\n");
+				paths.append(TextUtil.replicateString(DocConstants.SPACE, 5)).append("description: \"desc\"")
+						.append("\n");// TODO: desc response
 			});
-			
-
 
 		});
-//		Method[] privatefields = ReflectionHelperclass.getDeclaredMethods();
-//		for (Method onefield : privatefields) {
-//
-//			for (Annotation a : onefield.getDeclaredAnnotations()) {
-//				if (a != null) {
-//					if (a instanceof Path) {
-//						System.out.println("-> Path ::: " + ((Path) a).value());
-//						continue;
-//					}
-//					if (a instanceof Consumes) {
-//						System.out
-//								.println("-> Consume ::: " + ((Consumes) a).value()[((Consumes) a).value().length - 1]);
-//						continue;
-//					}
-//					if (a instanceof Produces) {
-//						System.out.println(
-//								"-> Produces ::: " + ((Produces) a).value()[((Produces) a).value().length - 1]);
-//						continue;
-//					}
-//					if (a instanceof POST) {
-//						System.out.println("-> Metodo ::: POST");
-//						for (Parameter q : onefield.getParameters()) {
-//							BodyObject bodyObject = new BodyObject();
-//							for (Field q1 : q.getType().getDeclaredFields()) {
-//								TuplaInBody tuplaInBody = new TuplaInBody();
-//								tuplaInBody.setName(q1.getName());
-//								tuplaInBody.setType(q1.getType().getName());
-//								System.out.println("-> Body Name :::" + q1.getName());
-//								System.out.println("-> Tipo :::" + q1.getType().getName());
-//								for (Annotation c : q1.getDeclaredAnnotations()) {
-//									if (c != null) {
-//										if (c instanceof Requerido) {
-//											tuplaInBody.setRequired(((Requerido) c).value());
-//											System.out.println("-> Requerido ::: " + ((Requerido) c).value());
-//											continue;
-//										}
-//									}
-//									bodyObject.getTuplaInBodies().add(tuplaInBody);
-//								}
-//								bodyConsumes.add(bodyObject);
-//							}
-//
-//						}
-//						continue;
-//					} else if (a instanceof GET) {
-//						System.out.println("-> Metodo ::: GET");
-//						for (Parameter q : onefield.getParameters()) {
-//							System.out.println("-> Path Nome :::" + q.getName());
-//							System.out.println("-> Tipo :::" + q.getType().getName());
-//
-//						}
-//						continue;
-//					} else if (a instanceof PUT) {
-//						System.out.println("-> Metodo ::: PUT");
-//						continue;
-//					}
-//				}
-//
-//			}
-//
-//		}
+		docText.setPaths(paths);
+		System.out.println(paths);
 
+		StringBuilder definitions = new StringBuilder("definitions:").append("\n");
+		objects.forEach((key, value) -> {
+			definitions.append(TextUtil.replicateString(DocConstants.SPACE, 1)).append("Funcionario:").append("\n");// TODO:
+																													// define
+																													// the
+																													// name
+			definitions.append(TextUtil.replicateString(DocConstants.SPACE, 2)).append("type: \"object\"").append("\n");// type
+			definitions.append(TextUtil.replicateString(DocConstants.SPACE, 2)).append("required:").append("\n");// Required
+
+			value.getTuplaInBodies().stream().filter(tuple -> tuple.getRequired() == true).collect(Collectors.toList())
+					.forEach(tuple -> {
+						definitions.append(TextUtil.replicateString(DocConstants.SPACE, 2))
+								.append("- \"" + tuple.getName() + "\"").append("\n");// Required Fields
+					});
+			definitions.append(TextUtil.replicateString(DocConstants.SPACE, 2)).append("properties:").append("\n");// Properties
+			value.getTuplaInBodies().forEach(tuple -> {
+				definitions.append(TextUtil.replicateString(DocConstants.SPACE, 3)).append("" + tuple.getName() + ":")
+						.append("\n");// Fields
+				definitions.append(TextUtil.replicateString(DocConstants.SPACE, 4)).append("type: ")
+						.append("\"" + tuple.getType() + "\"").append("\n");// Fields
+				definitions.append(TextUtil.replicateString(DocConstants.SPACE, 4)).append("example: ")
+						.append("\"" + tuple.getExample() + "\"").append("\n");// Fields
+			});
+		});
+		docText.setDefinitions(definitions);
+		System.out.println(definitions);
 	}
 
 }
