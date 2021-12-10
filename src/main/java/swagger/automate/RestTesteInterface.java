@@ -11,9 +11,12 @@ import swagger.automate.annotation.Tag;
 
 public interface RestTesteInterface {
 	
+	@Tag(value="Teste",description = "")
+	@Return(ReflectionHelper.class)
+	@Returns({200,300,400,500})
+	public Response restTeste(ReflectionHelper obj);
 	@Tag("Teste")
-//	@Description("Description teste")
 	@Return(ReflectionHelper.class)
 	@Returns()
-	public Response restTeste(ReflectionHelper obj);
+	public Response restTeste2(ReflectionHelper obj);
 }

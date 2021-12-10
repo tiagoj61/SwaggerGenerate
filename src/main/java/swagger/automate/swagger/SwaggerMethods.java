@@ -37,11 +37,11 @@ public class SwaggerMethods {
 	public static DocSwagger readClass(DocSwagger docSwagger) throws NoSuchMethodException, SecurityException {
 		Class<RestTeste> ReflectionHelperclass = RestTeste.class;
 
-		Reflections reflections = new Reflections("swagger.automate.rest", new SubTypesScanner(false));
-		Set<Class<? extends Object>> packs = reflections.getSubTypesOf(Object.class).stream()
-				.collect(Collectors.toSet());
-		List<Class<? extends Object>> asd = packs.stream().filter(a -> a.getPackageName() == "swagger.automate.rest")
-				.collect(Collectors.toList());
+//		Reflections reflections = new Reflections("swagger.automate.rest", new SubTypesScanner(false));
+//		Set<Class<? extends Object>> packs = reflections.getSubTypesOf(Object.class).stream()
+//				.collect(Collectors.toSet());
+//		List<Class<? extends Object>> asd = packs.stream().filter(a -> a.getPackageName() == "swagger.automate.rest")
+//				.collect(Collectors.toList());
 		Class[] interfaces = ReflectionHelperclass.getInterfaces();
 		for (Class declaredInterface : interfaces) {
 			Method[] privateInterfaceMethods = declaredInterface.getMethods();
@@ -126,11 +126,15 @@ public class SwaggerMethods {
 				for (Annotation annotationOfInterface : privateInterfaceMethod.getDeclaredAnnotations()) {
 					if (annotationOfInterface != null) {
 						if (annotationOfInterface instanceof swagger.automate.annotation.Tag) {
+							if (docSwagger.getTags().entrySet().stream().filter(value -> value.getValue()
+									.getName().equals(((swagger.automate.annotation.Tag) annotationOfInterface).value()))
+									.findAny().orElse(null) != null) {
+								continue;
+							}
 							tag.setName(((swagger.automate.annotation.Tag) annotationOfInterface).value());
-							continue;
-						}
-						if (annotationOfInterface instanceof Description) {
-							tag.setDescription(((Description) annotationOfInterface).value());
+							tag.setDescription(((swagger.automate.annotation.Tag) annotationOfInterface).description());
+							pathData.setTagKey(docSwagger.getTags().size());
+							docSwagger.getTags().put(docSwagger.getTags().size(), tag);
 							continue;
 						}
 						if (annotationOfInterface instanceof Returns) {
@@ -176,8 +180,7 @@ public class SwaggerMethods {
 					}
 
 				}
-				pathData.setTagKey(docSwagger.getTags().size());
-				docSwagger.getTags().put(docSwagger.getTags().size(), tag);
+
 				docSwagger.getPathDatas().add(pathData);
 			}
 		}

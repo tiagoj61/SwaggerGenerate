@@ -20,13 +20,13 @@ public class SwitchUtil {
 	public static String genereteExampleByType(Type type) {
 		switch (Classes.fromClass(type)) {
 		case INT:
-			return "1";
+			return "42";
 		case DOUB:
-			return "1.1";
+			return "4.2";
 		case STRING:
-			return "\"example\"";
+			return "\"Texto de exemplo\"";
 		default:
-			return "\"example\"";
+			return "\"Texto\"";
 		}
 	}
 }

@@ -26,5 +26,18 @@ public class RestTeste implements RestTesteInterface {
 			return Response.serverError().build();
 		}
 	}
+	@Path("login2")
+	@POST
+	@Consumes(MediaType.APPLICATION_JSON)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response restTeste2(ReflectionHelper obj) {
+		try {
+			
+			return Response.ok().build();
+		} catch (Exception e) {
+			e.printStackTrace();
+			return Response.serverError().build();
+		}
+	}
 
 }

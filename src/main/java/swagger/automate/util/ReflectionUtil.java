@@ -16,9 +16,7 @@ public class ReflectionUtil {
 			tuplaInBody.setName(((Parameter) field).getName());
 			tuplaInBody.setType(((Parameter) field).getType());
 			tuplaInBody.setExample(SwitchUtil.genereteExampleByType(((Field) field).getType()));
-
 		}
-
 		return tuplaInBody;
 	}
 

@@ -7,5 +7,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Tag {
-	public String value() default "Geral";
+	public String value() default "General";
+	public String description() default "Description";
 }
