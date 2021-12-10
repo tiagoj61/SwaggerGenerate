@@ -1,4 +1,4 @@
-package swagger.automate.operationutil;
+package swagger.automate.util;
 
 public class TextUtil {
 	public static String replicateString(String str, int quantity) {
