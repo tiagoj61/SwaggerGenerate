@@ -3,8 +3,11 @@ package swagger.automate.doc;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
+import org.springframework.util.StringUtils;
+
 import swagger.automate.constants.Constants;
 import swagger.automate.doc.bean.DocText;
+import swagger.automate.enumeration.Methods;
 import swagger.automate.swagger.bean.DocSwagger;
 import swagger.automate.util.TextUtil;
 import swagger.automate.util.SwitchUtil;
@@ -20,9 +23,9 @@ public class DocMethods {
 																												// the
 																												// desc
 		header.append(TextUtil.replicateString(Constants.SPACE, 1)).append("version: \"1.0.0\"").append("\n");// TODO:
-																													// define
-																													// the
-																													// version
+																												// define
+																												// the
+																												// version
 		header.append(TextUtil.replicateString(Constants.SPACE, 1)).append("title: \"Ponto Security rest\"")
 				.append("\n");// TODO: define the title
 		header.append("host: \"audax.mobi\"").append("\n");
@@ -46,52 +49,69 @@ public class DocMethods {
 		docSwagger.getPathDatas().forEach(pathData -> {
 			paths.append(TextUtil.replicateString(Constants.SPACE, 1)).append("/").append(pathData.getPath() + ":")
 					.append("\n");
-			paths.append(TextUtil.replicateString(Constants.SPACE, 2))
-					.append(pathData.getMethod().toLowerCase() + ":").append("\n");
+			paths.append(TextUtil.replicateString(Constants.SPACE, 2)).append(pathData.getMethod().toLowerCase() + ":")
+					.append("\n");
 
 			paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("tags:").append("\n");
 			paths.append(TextUtil.replicateString(Constants.SPACE, 3))
 					.append("- \"" + docSwagger.getTags().get(pathData.getTagKey()).getName() + "\"").append("\n");
-			paths.append(TextUtil.replicateString(Constants.SPACE, 3))
-					.append("summary: \"Loggar com o funcionario\"").append("\n");// TODO:
+			paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("summary: \"Loggar com o funcionario\"")
+					.append("\n");// TODO:
 			paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("description: \"Entrar no sistema\"")
 					.append("\n");// TODO:
-			paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("operationId: \""
-					+ docSwagger.getTags().get(pathData.getTagKey()).getName() + pathData.getPath() + "\"")
-					.append("\n");// TODO:
 
-			paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("consumes:").append("\n");
-			paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("- \"" + pathData.getConsumes() + "\"")
-					.append("\n");
-			paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("produces:").append("\n");
-			paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("- \"" + pathData.getProduces() + "\"")
-					.append("\n");
+			if (pathData.getMethod() == Methods.POST.name()) {
+				paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("operationId: \""
+						+ docSwagger.getTags().get(pathData.getTagKey()).getName() + pathData.getPath() + "\"")
+						.append("\n");
+				paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("consumes:").append("\n");
+				paths.append(TextUtil.replicateString(Constants.SPACE, 3))
+						.append("- \"" + pathData.getConsumes() + "\"").append("\n");
+				paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("produces:").append("\n");
+				paths.append(TextUtil.replicateString(Constants.SPACE, 3))
+						.append("- \"" + pathData.getProduces() + "\"").append("\n");
 
-			paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("parameters:").append("\n");
-			paths.append(TextUtil.replicateString(Constants.SPACE, 3))
-					.append("- in: \"" + (pathData.getMethod() == "POST" ? "body" : "path") + "\"").append("\n");
-			paths.append(TextUtil.replicateString(Constants.SPACE, 4))
-					.append("name: \"" + (pathData.getMethod() == "POST" ? "body" : "path") + "\"").append("\n");
-			paths.append(TextUtil.replicateString(Constants.SPACE, 4))
-					.append("description: \"Aparelhos bluetooth e senha do funcionario\"").append("\n");
-			paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("required: true").append("\n");
-			paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("schema:").append("\n");
-			// paths.append(TextUtil.replicateString(Constants.SPACE, 5)).append("$ref:
-			// \"#/definitions/"+objects.get(pathData.getConsumesBodyKey())+"\"").append("\n");//
-			// TODO: define the name
-			paths.append(TextUtil.replicateString(Constants.SPACE, 5)).append("$ref: \"#/definitions/"
-					+ docSwagger.getObjects().get(pathData.getProducesBodyKey()).getNome() + "\"").append("\n");// TODO:
-																												// define
-																												// the
-																												// name
+				paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("parameters:").append("\n");
+				paths.append(TextUtil.replicateString(Constants.SPACE, 3))
+						.append("- in: \"" + (pathData.getMethod() == "POST" ? "body" : "path") + "\"").append("\n");
+				paths.append(TextUtil.replicateString(Constants.SPACE, 4))
+						.append("name: \"" + (pathData.getMethod() == "POST" ? "body" : "path") + "\"").append("\n");
+				paths.append(TextUtil.replicateString(Constants.SPACE, 4))
+						.append("description: \"Aparelhos bluetooth e senha do funcionario\"").append("\n");
+				paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("required: true").append("\n");
+				paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("schema:").append("\n");
+				// paths.append(TextUtil.replicateString(Constants.SPACE, 5)).append("$ref:
+				// \"#/definitions/"+objects.get(pathData.getConsumesBodyKey())+"\"").append("\n");//
+				// TODO: define the name
+				paths.append(TextUtil.replicateString(Constants.SPACE, 5))
+						.append("$ref: \"#/definitions/"
+								+ docSwagger.getObjects().get(pathData.getProducesBodyKey()).getNome() + "\"")
+						.append("\n");// TODO:
+										// define
+										// the
+										// name
+			} else {
 
+				paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("parameters:").append("\n");
+				paths.append(TextUtil.replicateString(Constants.SPACE, 3))
+						.append("- in: " + (pathData.getMethod() == "POST" ? "body" : "path") + "").append("\n");
+
+				paths.append(TextUtil.replicateString(Constants.SPACE, 4))
+						.append("name: " + pathData.getPath().toString().substring(
+								pathData.getPath().toString().indexOf("{") + 1,
+								pathData.getPath().toString().indexOf("}")))
+						.append("\n");
+
+				paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("required: true").append("\n");
+				paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("type: integer").append("\n");
+			}
 			paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("responses:").append("\n");
 
 			Arrays.stream(pathData.getResponses().getResponses()).forEach(response -> {
-				paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("\"" + response + "\":")
-						.append("\n");
-				paths.append(TextUtil.replicateString(Constants.SPACE, 5)).append("description: \"desc\"")
-						.append("\n");// TODO: desc response
+				paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("\"" + response + "\":").append("\n");
+				paths.append(TextUtil.replicateString(Constants.SPACE, 5)).append("description: \"desc\"").append("\n");// TODO:
+																														// desc
+																														// response
 			});
 
 		});

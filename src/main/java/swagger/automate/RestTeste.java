@@ -1,6 +1,7 @@
 package swagger.automate;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
@@ -26,11 +27,11 @@ public class RestTeste implements RestTesteInterface {
 			return Response.serverError().build();
 		}
 	}
-	@Path("login2")
-	@POST
+	@Path("login2/{id}")
+	@GET
 	@Consumes(MediaType.APPLICATION_JSON)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response restTeste2(ReflectionHelper obj) {
+	public Response restTeste2(Long id) {
 		try {
 			
 			return Response.ok().build();

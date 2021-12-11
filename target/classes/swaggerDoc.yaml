@@ -1,0 +1,93 @@
+swagger: "2.0"
+info:
+  description: "Documento referente ao rest do sistema Ponto Security"
+  version: "1.0.0"
+  title: "Ponto Security rest"
+host: "audax.mobi"
+basePath: "/rest/"
+tags:
+- name: "Teste"
+  description: ""
+schemes:
+- "http"
+paths:
+  /login:
+    post:
+      tags:
+      - "Teste"
+      summary: "Loggar com o funcionario"
+      description: "Entrar no sistema"
+      operationId: "Testelogin"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Aparelhos bluetooth e senha do funcionario"
+        required: true
+        schema:
+          $ref: "#/definitions/ReflectionHelper2"
+      responses:
+        "200":
+          description: "desc"
+        "300":
+          description: "desc"
+        "400":
+          description: "desc"
+        "500":
+          description: "desc"
+  /login2/{id}:
+    get:
+      tags:
+      - "Teste"
+      summary: "Loggar com o funcionario"
+      description: "Entrar no sistema"
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: "desc"
+        "400":
+          description: "desc"
+        "500":
+          description: "desc"
+definitions:
+  ReflectionHelper:
+    type: "object"
+    required:
+    - "age"
+    properties:
+      age:
+        type: "integer"
+        example: 42
+      name:
+        type: "string"
+        example: "Texto de exemplo"
+      deptName:
+        type: "string"
+        example: "Texto de exemplo"
+      empID:
+        type: "integer"
+        example: 42
+  ReflectionHelper2:
+    type: "object"
+    required:
+    - "age"
+    properties:
+      age:
+        type: "integer"
+        example: 42
+      name:
+        type: "string"
+        example: "Texto de exemplo"
+      deptName:
+        type: "string"
+        example: "Texto de exemplo"
+      empID:
+        type: "integer"
+        example: 42

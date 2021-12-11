@@ -75,6 +75,10 @@ public class SwaggerMethods {
 								if (docSwagger.getObjects().entrySet().stream()
 										.filter(value -> value.getValue().getType() == consume.getType()).findAny()
 										.orElse(null) != null) {
+
+									pathData.setProducesBodyKey(docSwagger.getObjects().entrySet().stream()
+											.filter(value -> value.getValue().getType() == consume.getType()).findAny()
+											.get().getKey());
 									continue;
 								}
 								BodyObject bodyObject = new BodyObject();
@@ -100,20 +104,20 @@ public class SwaggerMethods {
 							continue;
 						} else if (annotationOfImplemented instanceof GET) {
 							pathData.setMethod("GET");
-							for (Parameter parameter : privateInterfaceMethod.getParameters()) {
-
-								TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(parameter);
-
-								List<TuplaInBody> tuples = new ArrayList();
-								tuples.add(tuplaInBody);
-
-								BodyObject bodyObject = new BodyObject();
-								bodyObject.setTuplaInBodies(tuples);
-
-								pathData.setConsumesBodyKey(docSwagger.getObjects().size());
-
-								docSwagger.getObjects().put(docSwagger.getObjects().size(), bodyObject);
-							}
+//							for (Parameter parameter : privateInterfaceMethod.getParameters()) {
+//
+//								TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(parameter);
+//
+//								List<TuplaInBody> tuples = new ArrayList();
+//								tuples.add(tuplaInBody);
+//
+//								BodyObject bodyObject = new BodyObject();
+//								bodyObject.setTuplaInBodies(tuples);
+//
+//								pathData.setConsumesBodyKey(docSwagger.getObjects().size());
+//
+//								docSwagger.getObjects().put(docSwagger.getObjects().size(), bodyObject);
+//							}
 							continue;
 						} else if (annotationOfImplemented instanceof PUT) {
 							pathData.setMethod("PUT");
@@ -126,9 +130,14 @@ public class SwaggerMethods {
 				for (Annotation annotationOfInterface : privateInterfaceMethod.getDeclaredAnnotations()) {
 					if (annotationOfInterface != null) {
 						if (annotationOfInterface instanceof swagger.automate.annotation.Tag) {
-							if (docSwagger.getTags().entrySet().stream().filter(value -> value.getValue()
-									.getName().equals(((swagger.automate.annotation.Tag) annotationOfInterface).value()))
+							if (docSwagger.getTags().entrySet().stream()
+									.filter(value -> value.getValue().getName()
+											.equals(((swagger.automate.annotation.Tag) annotationOfInterface).value()))
 									.findAny().orElse(null) != null) {
+								pathData.setTagKey(docSwagger.getTags().entrySet().stream()
+										.filter(value -> value.getValue().getName().equals(
+												((swagger.automate.annotation.Tag) annotationOfInterface).value()))
+										.findAny().get().getKey());
 								continue;
 							}
 							tag.setName(((swagger.automate.annotation.Tag) annotationOfInterface).value());
@@ -153,6 +162,9 @@ public class SwaggerMethods {
 							if (docSwagger.getObjects().entrySet().stream().filter(
 									value -> value.getValue().getType() == ((Return) annotationOfInterface).value())
 									.findAny().orElse(null) != null) {
+								pathData.setProducesBodyKey(docSwagger.getObjects().entrySet().stream().filter(
+										value -> value.getValue().getType() == ((Return) annotationOfInterface).value())
+										.findAny().get().getKey());
 								continue;
 							}
 							BodyObject bodyObject = new BodyObject();

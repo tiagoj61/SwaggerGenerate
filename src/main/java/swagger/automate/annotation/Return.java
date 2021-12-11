@@ -10,5 +10,5 @@ import swagger.automate.ReflectionHelper;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
 public @interface Return {
-	Class<? extends ReflectionHelper> value();
+	Class value();
 }
