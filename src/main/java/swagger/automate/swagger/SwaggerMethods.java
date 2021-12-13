@@ -6,8 +6,6 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -16,18 +14,15 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import org.reflections.Reflections;
-import org.reflections.scanners.SubTypesScanner;
-import org.springframework.context.annotation.Description;
-
 import swagger.automate.RestTeste;
 import swagger.automate.annotation.Requerido;
 import swagger.automate.annotation.Return;
 import swagger.automate.annotation.Returns;
-import swagger.automate.doc.bean.DocText;
+import swagger.automate.annotation.ReturnsCods;
 import swagger.automate.swagger.bean.BodyObject;
 import swagger.automate.swagger.bean.DocSwagger;
 import swagger.automate.swagger.bean.PathData;
+import swagger.automate.swagger.bean.ResponseAndCode;
 import swagger.automate.swagger.bean.Responses;
 import swagger.automate.swagger.bean.Tag;
 import swagger.automate.swagger.bean.TuplaInBody;
@@ -189,6 +184,42 @@ public class SwaggerMethods {
 							docSwagger.getObjects().put(docSwagger.getObjects().size(), bodyObject);
 							continue;
 						}
+						if (annotationOfInterface instanceof ReturnsCods) {
+							List<ResponseAndCode> reponses = new ArrayList<>();
+							var returnsAndCode = ((ReturnsCods) annotationOfInterface).value();
+							for (int i = 0; i < returnsAndCode.length; i++) {
+								var response = new ResponseAndCode();
+								if (((ReturnsCods) annotationOfInterface).value()[i].object() != InternalError.class) {
+
+									Field[] fileds = ((ReturnsCods) annotationOfInterface).value()[i].object()
+											.getDeclaredFields();
+									int a = i;
+									if (docSwagger.getObjects().entrySet().stream().filter(value -> value.getValue()
+											.getType() == ((ReturnsCods) annotationOfInterface).value()[a].object())
+											.findAny().orElse(null) != null) {
+										pathData.setProducesBodyKey(docSwagger.getObjects().entrySet().stream()
+												.filter(value -> value.getValue()
+														.getType() == ((ReturnsCods) annotationOfInterface).value()[a]
+																.object())
+												.findAny().get().getKey());
+									} else {
+										
+										BodyObject bodyObject = generateBodyObject(((ReturnsCods) annotationOfInterface).value()[a].object());
+											
+										response.setProducesBodyKey(docSwagger.getObjects().size());
+										
+										docSwagger.getObjects().put(docSwagger.getObjects().size(), bodyObject);
+										
+									}
+								} else {
+									response.setProducesBodyKey(-1);
+								}
+								response.setResponseCode(returnsAndCode[i].code());
+								reponses.add(response);
+
+							}
+							pathData.setResponseAndCodes(reponses);
+						}
 					}
 
 				}
@@ -197,5 +228,28 @@ public class SwaggerMethods {
 			}
 		}
 		return docSwagger;
+	}
+
+	public static BodyObject generateBodyObject(Class object) {
+		Field[] fileds = object.getDeclaredFields();
+
+		BodyObject bodyObject = new BodyObject();
+		bodyObject.setNome(object.getSimpleName());
+		bodyObject.setType(object);
+		for (Field field : fileds) {
+
+			TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(field);
+
+			for (Annotation annotationOfField : field.getDeclaredAnnotations()) {
+				if (annotationOfField != null) {
+					if (annotationOfField instanceof Requerido) {
+						tuplaInBody.setRequired(((Requerido) annotationOfField).value());
+						continue;
+					}
+				}
+			}
+			bodyObject.getTuplaInBodies().add(tuplaInBody);
+		}
+		return bodyObject;
 	}
 }

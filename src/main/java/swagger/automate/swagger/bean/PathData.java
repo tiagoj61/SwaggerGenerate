@@ -10,6 +10,7 @@ public class PathData {
 	private String consumes;
 	private String produces;
 	private Responses responses;
+	private List<ResponseAndCode> responseAndCodes;
 	private int consumesBodyKey;
 	private int producesBodyKey;
 
@@ -75,6 +76,14 @@ public class PathData {
 
 	public void setProducesBodyKey(int producesBodyKey) {
 		this.producesBodyKey = producesBodyKey;
+	}
+
+	public List<ResponseAndCode> getResponseAndCodes() {
+		return responseAndCodes;
+	}
+
+	public void setResponseAndCodes(List<ResponseAndCode> responseAndCodes) {
+		this.responseAndCodes = responseAndCodes;
 	}
 
 }

@@ -107,11 +107,19 @@ public class DocMethods {
 			}
 			paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("responses:").append("\n");
 
-			Arrays.stream(pathData.getResponses().getResponses()).forEach(response -> {
-				paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("\"" + response + "\":").append("\n");
+			pathData.getResponseAndCodes().forEach(response -> {
+				paths.append(TextUtil.replicateString(Constants.SPACE, 4))
+						.append("\"" + response.getResponseCode() + "\":").append("\n");
 				paths.append(TextUtil.replicateString(Constants.SPACE, 5)).append("description: \"desc\"").append("\n");// TODO:
 																														// desc
 																														// response
+				if (response.getProducesBodyKey() != -1) {
+					paths.append(TextUtil.replicateString(Constants.SPACE, 5)).append("schema:").append("\n");
+					paths.append(TextUtil.replicateString(Constants.SPACE, 6))
+							.append("$ref: \"#/definitions/"
+									+ docSwagger.getObjects().get(response.getProducesBodyKey()).getNome() + "\"")
+							.append("\n");
+				}
 			});
 
 		});

@@ -28,16 +28,14 @@ paths:
         description: "Aparelhos bluetooth e senha do funcionario"
         required: true
         schema:
-          $ref: "#/definitions/ReflectionHelper2"
+          $ref: "#/definitions/ReflectionHelper"
       responses:
         "200":
           description: "desc"
         "300":
           description: "desc"
-        "400":
-          description: "desc"
-        "500":
-          description: "desc"
+          schema:
+            $ref: "#/definitions/ReflectionHelper"
   /login2/{id}:
     get:
       tags:
@@ -52,9 +50,9 @@ paths:
       responses:
         "200":
           description: "desc"
-        "400":
-          description: "desc"
-        "500":
+          schema:
+            $ref: "#/definitions/ReflectionHelper"
+        "300":
           description: "desc"
 definitions:
   ReflectionHelper:
