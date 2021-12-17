@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Path("/usuario")
 public class RestTeste implements RestTesteInterface {
-
+	
 	@Path("login")
 	@POST
 	@Consumes(MediaType.APPLICATION_JSON)

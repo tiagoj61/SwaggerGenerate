@@ -4,6 +4,8 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +16,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
+import swagger.automate.ReflectionHelper;
 import swagger.automate.RestTeste;
 import swagger.automate.annotation.Requerido;
 import swagger.automate.annotation.Return;
@@ -231,6 +234,13 @@ public class SwaggerMethods {
 	}
 
 	public static BodyObject generateBodyObject(Class object) {
+		List<ReflectionHelper> a = new ArrayList<ReflectionHelper>();
+		ReflectionHelper w= new ReflectionHelper();
+		w.setAge(123);
+		w.setDeptName("aqui");
+		w.setName("adfasd");
+		a.add(w);
+		generateBodyObjectList(a.getClass());
 		Field[] fileds = object.getDeclaredFields();
 
 		BodyObject bodyObject = new BodyObject();
@@ -240,6 +250,49 @@ public class SwaggerMethods {
 
 			TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(field);
 
+			for (Annotation annotationOfField : field.getDeclaredAnnotations()) {
+				if (annotationOfField != null) {
+					if (annotationOfField instanceof Requerido) {
+						tuplaInBody.setRequired(((Requerido) annotationOfField).value());
+						continue;
+					}
+				}
+			}
+			bodyObject.getTuplaInBodies().add(tuplaInBody);
+		}
+		return bodyObject;
+	}
+	static <E> Class<E> getClassE(List<E> list) {
+	    Class<?> listClass = list.getClass();
+
+	    Type gSuper = listClass.getGenericSuperclass();
+	    if(!(gSuper instanceof ParameterizedType))
+	        throw new IllegalArgumentException();
+
+	    ParameterizedType pType = (ParameterizedType)gSuper;
+
+	    Type tArg = pType.getActualTypeArguments()[0];
+	    if(!(tArg instanceof Class<?>))
+	        throw new IllegalArgumentException();
+
+	    @SuppressWarnings("unchecked")
+	    final Class<E> classE = (Class<E>)tArg;
+	    System.out.println(classE);
+	    return classE;
+	}
+	public static <E> BodyObject generateBodyObjectList(Class object) {
+		System.out.println("aDASD");
+		System.out.println(object.getGenericSuperclass());
+		getClassE((List<E>) object.getClass());
+		Field[] fileds = object.getDeclaredFields();
+		
+		BodyObject bodyObject = new BodyObject();
+		bodyObject.setNome(object.getSimpleName());
+		bodyObject.setType(object);
+		for (Field field : fileds) {
+			
+			TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(field);
+			
 			for (Annotation annotationOfField : field.getDeclaredAnnotations()) {
 				if (annotationOfField != null) {
 					if (annotationOfField instanceof Requerido) {

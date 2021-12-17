@@ -3,8 +3,6 @@ package swagger.automate;
 import javax.ws.rs.core.Response;
 
 import swagger.automate.annotation.CodeAndReturn;
-import swagger.automate.annotation.Return;
-import swagger.automate.annotation.Returns;
 import swagger.automate.annotation.ReturnsCods;
 import swagger.automate.annotation.Tag;
 
