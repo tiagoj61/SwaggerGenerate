@@ -5,8 +5,8 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -40,6 +40,7 @@ public class SwaggerMethods {
 //				.collect(Collectors.toSet());
 //		List<Class<? extends Object>> asd = packs.stream().filter(a -> a.getPackageName() == "swagger.automate.rest")
 //				.collect(Collectors.toList());
+		
 		Class[] interfaces = ReflectionHelperclass.getInterfaces();
 		for (Class declaredInterface : interfaces) {
 			Method[] privateInterfaceMethods = declaredInterface.getMethods();
@@ -196,23 +197,33 @@ public class SwaggerMethods {
 
 									Field[] fileds = ((ReturnsCods) annotationOfInterface).value()[i].object()
 											.getDeclaredFields();
+
+//									Field integerListField = Test.class.getDeclaredField("integerList");
+//									ParameterizedType integerListType = (ParameterizedType) integerListField
+//											.getGenericType();
+//									Class<?> integerListClass = (Class<?>) integerListType.getActualTypeArguments()[0];
+//									System.out.println(integerListClass); // class java.lang.Integer.
+
 									int a = i;
 									if (docSwagger.getObjects().entrySet().stream().filter(value -> value.getValue()
 											.getType() == ((ReturnsCods) annotationOfInterface).value()[a].object())
 											.findAny().orElse(null) != null) {
+										
 										pathData.setProducesBodyKey(docSwagger.getObjects().entrySet().stream()
 												.filter(value -> value.getValue()
 														.getType() == ((ReturnsCods) annotationOfInterface).value()[a]
 																.object())
 												.findAny().get().getKey());
+										
 									} else {
-										
-										BodyObject bodyObject = generateBodyObject(((ReturnsCods) annotationOfInterface).value()[a].object());
-											
+
+										BodyObject bodyObject = generateBodyObject(
+												((ReturnsCods) annotationOfInterface).value()[a].object());
+
 										response.setProducesBodyKey(docSwagger.getObjects().size());
-										
+
 										docSwagger.getObjects().put(docSwagger.getObjects().size(), bodyObject);
-										
+
 									}
 								} else {
 									response.setProducesBodyKey(-1);
@@ -234,13 +245,6 @@ public class SwaggerMethods {
 	}
 
 	public static BodyObject generateBodyObject(Class object) {
-		List<ReflectionHelper> a = new ArrayList<ReflectionHelper>();
-		ReflectionHelper w= new ReflectionHelper();
-		w.setAge(123);
-		w.setDeptName("aqui");
-		w.setName("adfasd");
-		a.add(w);
-		generateBodyObjectList(a.getClass());
 		Field[] fileds = object.getDeclaredFields();
 
 		BodyObject bodyObject = new BodyObject();
@@ -262,47 +266,51 @@ public class SwaggerMethods {
 		}
 		return bodyObject;
 	}
-	static <E> Class<E> getClassE(List<E> list) {
-	    Class<?> listClass = list.getClass();
 
-	    Type gSuper = listClass.getGenericSuperclass();
-	    if(!(gSuper instanceof ParameterizedType))
-	        throw new IllegalArgumentException();
-
-	    ParameterizedType pType = (ParameterizedType)gSuper;
-
-	    Type tArg = pType.getActualTypeArguments()[0];
-	    if(!(tArg instanceof Class<?>))
-	        throw new IllegalArgumentException();
-
-	    @SuppressWarnings("unchecked")
-	    final Class<E> classE = (Class<E>)tArg;
-	    System.out.println(classE);
-	    return classE;
-	}
-	public static <E> BodyObject generateBodyObjectList(Class object) {
-		System.out.println("aDASD");
-		System.out.println(object.getGenericSuperclass());
-		getClassE((List<E>) object.getClass());
-		Field[] fileds = object.getDeclaredFields();
-		
-		BodyObject bodyObject = new BodyObject();
-		bodyObject.setNome(object.getSimpleName());
-		bodyObject.setType(object);
-		for (Field field : fileds) {
-			
-			TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(field);
-			
-			for (Annotation annotationOfField : field.getDeclaredAnnotations()) {
-				if (annotationOfField != null) {
-					if (annotationOfField instanceof Requerido) {
-						tuplaInBody.setRequired(((Requerido) annotationOfField).value());
-						continue;
-					}
-				}
-			}
-			bodyObject.getTuplaInBodies().add(tuplaInBody);
-		}
-		return bodyObject;
+//	public static <E, T> BodyObject generateBodyObjectList(Class object) {
+//		
+//		
+//		
+//		List<ReflectionHelper> list = new ArrayList<ReflectionHelper>();
+//		Iterator it = list.iterator();
+//		System.out.println("ite");
+//		System.out.println(it);
+//		// if (it.hasNext()) {
+//		System.out.println("----it---");
+//		System.out.println(it.next().getClass());
+//		// }
+//		System.out.println(list.getClass());
+//		System.out.println(list.getClass().getGenericSuperclass());
+//		System.out.println(((ParameterizedType) list.getClass().getGenericSuperclass()).getActualTypeArguments());
+//		System.out.println(((ParameterizedType) list.getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
+//		System.out.println((ReflectionHelper) (((ParameterizedType) list.getClass().getGenericSuperclass())
+//				.getActualTypeArguments()[0]));
+//		Field[] fileds = object.getDeclaredFields();
+//
+//		BodyObject bodyObject = new BodyObject();
+//		bodyObject.setNome(object.getSimpleName());
+//		bodyObject.setType(object);
+//		for (Field field : fileds) {
+//
+//			TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(field);
+//
+//			for (Annotation annotationOfField : field.getDeclaredAnnotations()) {
+//				if (annotationOfField != null) {
+//					if (annotationOfField instanceof Requerido) {
+//						tuplaInBody.setRequired(((Requerido) annotationOfField).value());
+//						continue;
+//					}
+//				}
+//			}
+//			bodyObject.getTuplaInBodies().add(tuplaInBody);
+//		}
+//		return bodyObject;
+//	}
+	public Class getGeneric(Field field) {
+		Field stringListField = field;
+		ParameterizedType stringListType = (ParameterizedType) stringListField.getGenericType();
+		Class<?> stringListClass = (Class<?>) stringListType.getActualTypeArguments()[0];
+		System.out.println(stringListClass); // class java.lang.String.
+		return stringListClass;
 	}
 }

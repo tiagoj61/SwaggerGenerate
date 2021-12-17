@@ -7,28 +7,10 @@ host: "audax.mobi"
 basePath: "/rest/"
 tags:
 - name: "Teste"
-  description: "Description"
+  description: ""
 schemes:
 - "http"
 paths:
-  /login2/{id}:
-    get:
-      tags:
-      - "Teste"
-      summary: "Loggar com o funcionario"
-      description: "Entrar no sistema"
-      parameters:
-      - in: path
-        name: id
-        required: true
-        type: integer
-      responses:
-        "200":
-          description: "desc"
-          schema:
-            $ref: "#/definitions/ReflectionHelper"
-        "300":
-          description: "desc"
   /login:
     post:
       tags:
@@ -54,6 +36,24 @@ paths:
           description: "desc"
           schema:
             $ref: "#/definitions/ReflectionHelper"
+  /login2/{id}:
+    get:
+      tags:
+      - "Teste"
+      summary: "Loggar com o funcionario"
+      description: "Entrar no sistema"
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: "desc"
+          schema:
+            $ref: "#/definitions/ReflectionHelper"
+        "300":
+          description: "desc"
 definitions:
   ReflectionHelper:
     type: "object"
@@ -72,3 +72,6 @@ definitions:
       empID:
         type: "integer"
         example: 42
+      arra:
+        type: "string"
+        example: "Texto"

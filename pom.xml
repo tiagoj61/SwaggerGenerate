@@ -6,6 +6,8 @@
 	<artifactId>SwaggerAutomate</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<dependencies>
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
+		<!-- https://mvnrepository.com/artifact/com.google.guava/guava -->
 
 		<dependency>
 			<groupId>javax.servlet</groupId>

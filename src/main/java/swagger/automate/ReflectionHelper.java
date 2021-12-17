@@ -1,5 +1,7 @@
 package swagger.automate;
 
+import java.util.List;
+
 import swagger.automate.annotation.Requerido;
 
 public class ReflectionHelper {
@@ -8,6 +10,7 @@ public class ReflectionHelper {
 	private String name;
 	public String deptName;
 	public int empID;
+	public List<Double> teste;
 
 	public int getAge() {
 		return age;
@@ -32,4 +35,21 @@ public class ReflectionHelper {
 	public void setDeptName(String deptName) {
 		this.deptName = deptName;
 	}
+
+	public int getEmpID() {
+		return empID;
+	}
+
+	public void setEmpID(int empID) {
+		this.empID = empID;
+	}
+
+	public List<Double> getTeste() {
+		return teste;
+	}
+
+	public void setTeste(List<Double> teste) {
+		this.teste = teste;
+	}
+
 }

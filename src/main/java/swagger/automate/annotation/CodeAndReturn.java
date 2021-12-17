@@ -12,4 +12,5 @@ public @interface CodeAndReturn {
 	public int code();
 
 	public Class object() default InternalError.class;
+	public boolean array() default false;
 }
