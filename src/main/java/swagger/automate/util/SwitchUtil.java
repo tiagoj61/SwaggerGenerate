@@ -13,6 +13,8 @@ public class SwitchUtil {
 			return "number";
 		case STRING:
 			return "string";
+		case LIST:
+			return "array";
 		default:
 			return "string";
 		}

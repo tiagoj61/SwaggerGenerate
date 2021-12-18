@@ -5,6 +5,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -17,6 +18,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
 import swagger.automate.ReflectionHelper;
+import swagger.automate.ReflectionHelper2;
 import swagger.automate.RestTeste;
 import swagger.automate.annotation.Requerido;
 import swagger.automate.annotation.Return;
@@ -32,7 +34,8 @@ import swagger.automate.swagger.bean.TuplaInBody;
 import swagger.automate.util.ReflectionUtil;
 
 public class SwaggerMethods {
-	public static DocSwagger readClass(DocSwagger docSwagger) throws NoSuchMethodException, SecurityException {
+	public static DocSwagger readClass(DocSwagger docSwagger)
+			throws NoSuchMethodException, SecurityException, ClassNotFoundException {
 		Class<RestTeste> ReflectionHelperclass = RestTeste.class;
 
 //		Reflections reflections = new Reflections("swagger.automate.rest", new SubTypesScanner(false));
@@ -40,7 +43,7 @@ public class SwaggerMethods {
 //				.collect(Collectors.toSet());
 //		List<Class<? extends Object>> asd = packs.stream().filter(a -> a.getPackageName() == "swagger.automate.rest")
 //				.collect(Collectors.toList());
-		
+
 		Class[] interfaces = ReflectionHelperclass.getInterfaces();
 		for (Class declaredInterface : interfaces) {
 			Method[] privateInterfaceMethods = declaredInterface.getMethods();
@@ -157,7 +160,7 @@ public class SwaggerMethods {
 						 * Catch the return
 						 */
 						if (annotationOfInterface instanceof Return) {
-							Field[] fileds = ((Return) annotationOfInterface).value().getDeclaredFields();
+
 							if (docSwagger.getObjects().entrySet().stream().filter(
 									value -> value.getValue().getType() == ((Return) annotationOfInterface).value())
 									.findAny().orElse(null) != null) {
@@ -166,6 +169,7 @@ public class SwaggerMethods {
 										.findAny().get().getKey());
 								continue;
 							}
+							Field[] fileds = ((Return) annotationOfInterface).value().getDeclaredFields();
 							BodyObject bodyObject = new BodyObject();
 							bodyObject.setNome(((Return) annotationOfInterface).value().getSimpleName());
 							bodyObject.setType(((Return) annotationOfInterface).value());
@@ -180,6 +184,11 @@ public class SwaggerMethods {
 											continue;
 										}
 									}
+								}
+								if (tuplaInBody.getReference()!= null) {
+									BodyObject bo = createObject(tuplaInBody.getReference());
+									
+									docSwagger.getObjects().put(docSwagger.getObjects().size(), bo);
 								}
 								bodyObject.getTuplaInBodies().add(tuplaInBody);
 							}
@@ -208,13 +217,13 @@ public class SwaggerMethods {
 									if (docSwagger.getObjects().entrySet().stream().filter(value -> value.getValue()
 											.getType() == ((ReturnsCods) annotationOfInterface).value()[a].object())
 											.findAny().orElse(null) != null) {
-										
+
 										pathData.setProducesBodyKey(docSwagger.getObjects().entrySet().stream()
 												.filter(value -> value.getValue()
 														.getType() == ((ReturnsCods) annotationOfInterface).value()[a]
 																.object())
 												.findAny().get().getKey());
-										
+
 									} else {
 
 										BodyObject bodyObject = generateBodyObject(
@@ -223,6 +232,21 @@ public class SwaggerMethods {
 										response.setProducesBodyKey(docSwagger.getObjects().size());
 
 										docSwagger.getObjects().put(docSwagger.getObjects().size(), bodyObject);
+										bodyObject.getTuplaInBodies().forEach(q -> {
+											BodyObject bo = null;
+											try {
+
+												if (q.getReference() != null) {
+													bo = createObject(q.getReference());
+													System.out.println(bo.getType());
+													System.out.println(bo.getNome());
+													docSwagger.getObjects().put(docSwagger.getObjects().size(), bo);
+												}
+											} catch (ClassNotFoundException e) {
+												// TODO Auto-generated catch block
+												e.printStackTrace();
+											}
+										});
 
 									}
 								} else {
@@ -241,15 +265,41 @@ public class SwaggerMethods {
 				docSwagger.getPathDatas().add(pathData);
 			}
 		}
+		System.out.println(docSwagger.getObjects().size());
 		return docSwagger;
 	}
 
-	public static BodyObject generateBodyObject(Class object) {
+	private static BodyObject createObject(Class type) throws ClassNotFoundException {
+		Field[] fileds = type.getDeclaredFields();
+		BodyObject bodyObject = new BodyObject();
+		bodyObject.setNome(type.getSimpleName());
+		bodyObject.setType(type);
+		for (Field field : fileds) {
+
+			TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(field);
+
+			for (Annotation annotationOfField : field.getDeclaredAnnotations()) {
+				if (annotationOfField != null) {
+					if (annotationOfField instanceof Requerido) {
+						tuplaInBody.setRequired(((Requerido) annotationOfField).value());
+						continue;
+					}
+				}
+			}
+			bodyObject.getTuplaInBodies().add(tuplaInBody);
+		}
+
+		return bodyObject;
+	}
+
+	public static BodyObject generateBodyObject(Class object) throws ClassNotFoundException {
+
 		Field[] fileds = object.getDeclaredFields();
 
 		BodyObject bodyObject = new BodyObject();
 		bodyObject.setNome(object.getSimpleName());
 		bodyObject.setType(object);
+
 		for (Field field : fileds) {
 
 			TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(field);
@@ -273,7 +323,6 @@ public class SwaggerMethods {
 //		
 //		List<ReflectionHelper> list = new ArrayList<ReflectionHelper>();
 //		Iterator it = list.iterator();
-//		System.out.println("ite");
 //		System.out.println(it);
 //		// if (it.hasNext()) {
 //		System.out.println("----it---");
@@ -310,7 +359,6 @@ public class SwaggerMethods {
 		Field stringListField = field;
 		ParameterizedType stringListType = (ParameterizedType) stringListField.getGenericType();
 		Class<?> stringListClass = (Class<?>) stringListType.getActualTypeArguments()[0];
-		System.out.println(stringListClass); // class java.lang.String.
 		return stringListClass;
 	}
 }

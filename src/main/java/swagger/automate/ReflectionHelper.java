@@ -10,7 +10,7 @@ public class ReflectionHelper {
 	private String name;
 	public String deptName;
 	public int empID;
-	public List<Double> teste;
+	public List<ReflectionHelper2> teste;
 
 	public int getAge() {
 		return age;
@@ -44,11 +44,11 @@ public class ReflectionHelper {
 		this.empID = empID;
 	}
 
-	public List<Double> getTeste() {
+	public List<ReflectionHelper2> getTeste() {
 		return teste;
 	}
 
-	public void setTeste(List<Double> teste) {
+	public void setTeste(List<ReflectionHelper2> teste) {
 		this.teste = teste;
 	}
 

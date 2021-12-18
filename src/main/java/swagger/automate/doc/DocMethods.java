@@ -130,6 +130,7 @@ public class DocMethods {
 	private static DocText generateDefinitions(DocSwagger docSwagger, DocText docText) {
 		StringBuilder definitions = new StringBuilder("definitions:").append("\n");
 		docSwagger.getObjects().forEach((key, value) -> {
+			System.out.println(value.getNome());
 			definitions.append(TextUtil.replicateString(Constants.SPACE, 1)).append(value.getNome()).append(":")
 					.append("\n");// TODO:
 			// define
@@ -149,9 +150,14 @@ public class DocMethods {
 						.append("\n");// Fields
 				definitions.append(TextUtil.replicateString(Constants.SPACE, 4)).append("type: ")
 						.append("\"" + SwitchUtil.convertTypeToJson(tuple.getType()) + "\"").append("\n");// Fields
+				if (tuple.getReference() != null) {
+					definitions.append(TextUtil.replicateString(Constants.SPACE, 4)).append("items: ").append("\n");// Fields
+					definitions.append(TextUtil.replicateString(Constants.SPACE, 5)).append("$ref: \"#/definitions/"+tuple.getReference().getSimpleName()+"\"").append("\n");// Fields
 
-				definitions.append(TextUtil.replicateString(Constants.SPACE, 4)).append("example: ")
-						.append(tuple.getExample()).append("\n");// Fields
+				} else {
+					definitions.append(TextUtil.replicateString(Constants.SPACE, 4)).append("example: ")
+							.append(tuple.getExample()).append("\n");// Fields
+				}
 			});
 		});
 		docText.setDefinitions(definitions);

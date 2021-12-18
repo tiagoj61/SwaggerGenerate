@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 public class TuplaInBody {
 	private String name;
 	private Type type;
+	private Class reference;
 	private boolean required;
 	private String example;
 
@@ -38,6 +39,14 @@ public class TuplaInBody {
 
 	public void setExample(String example) {
 		this.example = example;
+	}
+
+	public Class getReference() {
+		return reference;
+	}
+
+	public void setReference(Class reference) {
+		this.reference = reference;
 	}
 
 }

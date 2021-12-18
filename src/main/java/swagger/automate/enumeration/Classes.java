@@ -1,9 +1,10 @@
 package swagger.automate.enumeration;
 
 import java.lang.reflect.Type;
+import java.util.List;
 
 public enum Classes {
-	INT(int.class), DOUB(double.class), STRING(String.class), UNKNOWN(null);
+	INT(int.class), DOUB(double.class), STRING(String.class), LIST(List.class), UNKNOWN(null);
 
 	private final Class<?> targetClass;
 

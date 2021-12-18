@@ -17,7 +17,7 @@ public class ReflectionDemo {
 	static DocText docText;
 
 	public static void main(String[] args)
-			throws NoSuchFieldException, SecurityException, NoSuchMethodException, IOException, URISyntaxException {
+			throws NoSuchFieldException, SecurityException, NoSuchMethodException, IOException, URISyntaxException, ClassNotFoundException {
 		System.gc();
 		docText = new DocText();
 		docSwagger = new DocSwagger();
