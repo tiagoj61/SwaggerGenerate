@@ -4,13 +4,12 @@ import java.util.List;
 
 import swagger.automate.annotation.Requerido;
 
-public class ReflectionHelper2 {
+public class ReflectionHelper3 {
 	@Requerido(true)
 	private int age;
 	private String name;
 	public String deptName;
 	public int empID;
-	public List<ReflectionHelper3> teste;
 
 	public int getAge() {
 		return age;
@@ -44,12 +43,5 @@ public class ReflectionHelper2 {
 		this.empID = empID;
 	}
 
-	public List<ReflectionHelper3> getTeste() {
-		return teste;
-	}
-
-	public void setTeste(List<ReflectionHelper3> teste) {
-		this.teste = teste;
-	}
 	
 }

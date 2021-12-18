@@ -111,14 +111,24 @@ public class DocMethods {
 				paths.append(TextUtil.replicateString(Constants.SPACE, 4))
 						.append("\"" + response.getResponseCode() + "\":").append("\n");
 				paths.append(TextUtil.replicateString(Constants.SPACE, 5)).append("description: \"desc\"").append("\n");// TODO:
-																														// desc
 																														// response
 				if (response.getProducesBodyKey() != -1) {
 					paths.append(TextUtil.replicateString(Constants.SPACE, 5)).append("schema:").append("\n");
-					paths.append(TextUtil.replicateString(Constants.SPACE, 6))
-							.append("$ref: \"#/definitions/"
-									+ docSwagger.getObjects().get(response.getProducesBodyKey()).getNome() + "\"")
-							.append("\n");
+					if (response.isArray()) {
+						paths.append(TextUtil.replicateString(Constants.SPACE, 6)).append("type: \"array\"").append("\n");
+						paths.append(TextUtil.replicateString(Constants.SPACE, 6)).append("items:").append("\n");
+
+						paths.append(TextUtil.replicateString(Constants.SPACE, 7))
+								.append("$ref: \"#/definitions/"
+										+ docSwagger.getObjects().get(response.getProducesBodyKey()).getNome() + "\"")
+								.append("\n");
+					} else {
+						paths.append(TextUtil.replicateString(Constants.SPACE, 6))
+								.append("$ref: \"#/definitions/"
+										+ docSwagger.getObjects().get(response.getProducesBodyKey()).getNome() + "\"")
+								.append("\n");
+					}
+
 				}
 			});
 
@@ -128,9 +138,9 @@ public class DocMethods {
 	}
 
 	private static DocText generateDefinitions(DocSwagger docSwagger, DocText docText) {
+		System.out.println("ultimo:"+docSwagger.getObjects().size());
 		StringBuilder definitions = new StringBuilder("definitions:").append("\n");
 		docSwagger.getObjects().forEach((key, value) -> {
-			System.out.println(value.getNome());
 			definitions.append(TextUtil.replicateString(Constants.SPACE, 1)).append(value.getNome()).append(":")
 					.append("\n");// TODO:
 			// define
@@ -145,14 +155,19 @@ public class DocMethods {
 								.append("- \"" + tuple.getName() + "\"").append("\n");// Required Fields
 					});
 			definitions.append(TextUtil.replicateString(Constants.SPACE, 2)).append("properties:").append("\n");// Properties
+			System.out.println("saide----------------");
+			System.out.println(value.getNome());
 			value.getTuplaInBodies().forEach(tuple -> {
+				System.out.println(tuple.getName());
 				definitions.append(TextUtil.replicateString(Constants.SPACE, 3)).append("" + tuple.getName() + ":")
 						.append("\n");// Fields
 				definitions.append(TextUtil.replicateString(Constants.SPACE, 4)).append("type: ")
 						.append("\"" + SwitchUtil.convertTypeToJson(tuple.getType()) + "\"").append("\n");// Fields
 				if (tuple.getReference() != null) {
 					definitions.append(TextUtil.replicateString(Constants.SPACE, 4)).append("items: ").append("\n");// Fields
-					definitions.append(TextUtil.replicateString(Constants.SPACE, 5)).append("$ref: \"#/definitions/"+tuple.getReference().getSimpleName()+"\"").append("\n");// Fields
+					definitions.append(TextUtil.replicateString(Constants.SPACE, 5))
+							.append("$ref: \"#/definitions/" + tuple.getReference().getSimpleName() + "\"")
+							.append("\n");// Fields
 
 				} else {
 					definitions.append(TextUtil.replicateString(Constants.SPACE, 4)).append("example: ")

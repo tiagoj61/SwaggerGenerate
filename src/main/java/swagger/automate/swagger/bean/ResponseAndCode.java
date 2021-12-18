@@ -2,6 +2,7 @@ package swagger.automate.swagger.bean;
 
 public class ResponseAndCode {
 	private int producesBodyKey;
+	private boolean array;
 	private int responseCode;
 
 	public int getProducesBodyKey() {
@@ -18,6 +19,14 @@ public class ResponseAndCode {
 
 	public void setResponseCode(int responseCode) {
 		this.responseCode = responseCode;
+	}
+
+	public boolean isArray() {
+		return array;
+	}
+
+	public void setArray(boolean array) {
+		this.array = array;
 	}
 
 }

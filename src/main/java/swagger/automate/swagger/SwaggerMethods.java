@@ -34,6 +34,8 @@ import swagger.automate.swagger.bean.TuplaInBody;
 import swagger.automate.util.ReflectionUtil;
 
 public class SwaggerMethods {
+	private static DocSwagger docSwaggerAux = new DocSwagger();
+
 	public static DocSwagger readClass(DocSwagger docSwagger)
 			throws NoSuchMethodException, SecurityException, ClassNotFoundException {
 		Class<RestTeste> ReflectionHelperclass = RestTeste.class;
@@ -185,9 +187,9 @@ public class SwaggerMethods {
 										}
 									}
 								}
-								if (tuplaInBody.getReference()!= null) {
+								if (tuplaInBody.getReference() != null) {
 									BodyObject bo = createObject(tuplaInBody.getReference());
-									
+
 									docSwagger.getObjects().put(docSwagger.getObjects().size(), bo);
 								}
 								bodyObject.getTuplaInBodies().add(tuplaInBody);
@@ -198,6 +200,7 @@ public class SwaggerMethods {
 							continue;
 						}
 						if (annotationOfInterface instanceof ReturnsCods) {
+							// getReturnsAndCode();
 							List<ResponseAndCode> reponses = new ArrayList<>();
 							var returnsAndCode = ((ReturnsCods) annotationOfInterface).value();
 							for (int i = 0; i < returnsAndCode.length; i++) {
@@ -211,7 +214,6 @@ public class SwaggerMethods {
 //									ParameterizedType integerListType = (ParameterizedType) integerListField
 //											.getGenericType();
 //									Class<?> integerListClass = (Class<?>) integerListType.getActualTypeArguments()[0];
-//									System.out.println(integerListClass); // class java.lang.Integer.
 
 									int a = i;
 									if (docSwagger.getObjects().entrySet().stream().filter(value -> value.getValue()
@@ -230,18 +232,28 @@ public class SwaggerMethods {
 												((ReturnsCods) annotationOfInterface).value()[a].object());
 
 										response.setProducesBodyKey(docSwagger.getObjects().size());
+										response.setArray(returnsAndCode[i].array());
 
 										docSwagger.getObjects().put(docSwagger.getObjects().size(), bodyObject);
+
 										bodyObject.getTuplaInBodies().forEach(q -> {
+											System.out.println("-------vaolta----------");
 											BodyObject bo = null;
 											try {
 
 												if (q.getReference() != null) {
 													bo = createObject(q.getReference());
-													System.out.println(bo.getType());
-													System.out.println(bo.getNome());
 													docSwagger.getObjects().put(docSwagger.getObjects().size(), bo);
+
 												}
+												System.out.println(docSwagger.getObjects().get(docSwagger.getObjects().size()-1).getNome());
+												System.out.println("tam"+docSwaggerAux.getObjects().size());
+												docSwaggerAux.getObjects().forEach((qwe, aux) -> {
+													System.out.println(aux.getNome());
+													docSwagger.getObjects().put(docSwagger.getObjects().size(), aux);
+												});
+												docSwaggerAux=new DocSwagger();
+
 											} catch (ClassNotFoundException e) {
 												// TODO Auto-generated catch block
 												e.printStackTrace();
@@ -253,6 +265,7 @@ public class SwaggerMethods {
 									response.setProducesBodyKey(-1);
 								}
 								response.setResponseCode(returnsAndCode[i].code());
+								response.setArray(returnsAndCode[i].array());
 								reponses.add(response);
 
 							}
@@ -265,19 +278,27 @@ public class SwaggerMethods {
 				docSwagger.getPathDatas().add(pathData);
 			}
 		}
-		System.out.println(docSwagger.getObjects().size());
 		return docSwagger;
 	}
 
 	private static BodyObject createObject(Class type) throws ClassNotFoundException {
+		System.out.println("tipo: "+type.getName());
 		Field[] fileds = type.getDeclaredFields();
+
 		BodyObject bodyObject = new BodyObject();
 		bodyObject.setNome(type.getSimpleName());
 		bodyObject.setType(type);
+
 		for (Field field : fileds) {
 
 			TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(field);
+			if (tuplaInBody.getReference() != null) {
 
+				docSwaggerAux.getObjects().put(docSwaggerAux.getObjects().size(),
+						createObject(tuplaInBody.getReference()));
+				System.out.println("printou : "+ docSwaggerAux.getObjects().get(0).getNome());
+
+			}
 			for (Annotation annotationOfField : field.getDeclaredAnnotations()) {
 				if (annotationOfField != null) {
 					if (annotationOfField instanceof Requerido) {
@@ -317,44 +338,6 @@ public class SwaggerMethods {
 		return bodyObject;
 	}
 
-//	public static <E, T> BodyObject generateBodyObjectList(Class object) {
-//		
-//		
-//		
-//		List<ReflectionHelper> list = new ArrayList<ReflectionHelper>();
-//		Iterator it = list.iterator();
-//		System.out.println(it);
-//		// if (it.hasNext()) {
-//		System.out.println("----it---");
-//		System.out.println(it.next().getClass());
-//		// }
-//		System.out.println(list.getClass());
-//		System.out.println(list.getClass().getGenericSuperclass());
-//		System.out.println(((ParameterizedType) list.getClass().getGenericSuperclass()).getActualTypeArguments());
-//		System.out.println(((ParameterizedType) list.getClass().getGenericSuperclass()).getActualTypeArguments()[0]);
-//		System.out.println((ReflectionHelper) (((ParameterizedType) list.getClass().getGenericSuperclass())
-//				.getActualTypeArguments()[0]));
-//		Field[] fileds = object.getDeclaredFields();
-//
-//		BodyObject bodyObject = new BodyObject();
-//		bodyObject.setNome(object.getSimpleName());
-//		bodyObject.setType(object);
-//		for (Field field : fileds) {
-//
-//			TuplaInBody tuplaInBody = ReflectionUtil.tupleFromSomeone(field);
-//
-//			for (Annotation annotationOfField : field.getDeclaredAnnotations()) {
-//				if (annotationOfField != null) {
-//					if (annotationOfField instanceof Requerido) {
-//						tuplaInBody.setRequired(((Requerido) annotationOfField).value());
-//						continue;
-//					}
-//				}
-//			}
-//			bodyObject.getTuplaInBodies().add(tuplaInBody);
-//		}
-//		return bodyObject;
-//	}
 	public Class getGeneric(Field field) {
 		Field stringListField = field;
 		ParameterizedType stringListType = (ParameterizedType) stringListField.getGenericType();

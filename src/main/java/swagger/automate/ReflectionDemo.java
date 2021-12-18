@@ -18,10 +18,8 @@ public class ReflectionDemo {
 
 	public static void main(String[] args)
 			throws NoSuchFieldException, SecurityException, NoSuchMethodException, IOException, URISyntaxException, ClassNotFoundException {
-		System.gc();
 		docText = new DocText();
 		docSwagger = new DocSwagger();
-		
 		docSwagger = SwaggerMethods.readClass(docSwagger);
 		docText = DocMethods.generateHeader(docSwagger, docText);
 		docText.putTextInFile();

@@ -11,11 +11,8 @@ public class ReflectionUtil {
 	public static <T> TuplaInBody tupleFromSomeone(T field) throws ClassNotFoundException {
 		TuplaInBody tuplaInBody = new TuplaInBody();
 		if (field instanceof Field) {
-			// System.out.println(Class.forName(((Field)
 			// field).getType().getName()).isInstance(List.class));
-			// System.out.println(Class.forName(((Field)
 			// field).getType().getName()).isInstance(List.class));
-			// System.out.println(((Field) field).getType() instanceof List);
 //			if(((Field) field).getType() instanceof List) {
 
 			// }

@@ -7,28 +7,10 @@ host: "audax.mobi"
 basePath: "/rest/"
 tags:
 - name: "Teste"
-  description: "Description"
+  description: ""
 schemes:
 - "http"
 paths:
-  /login2/{id}:
-    get:
-      tags:
-      - "Teste"
-      summary: "Loggar com o funcionario"
-      description: "Entrar no sistema"
-      parameters:
-      - in: path
-        name: id
-        required: true
-        type: integer
-      responses:
-        "200":
-          description: "desc"
-          schema:
-            $ref: "#/definitions/ReflectionHelper"
-        "300":
-          description: "desc"
   /login:
     post:
       tags:
@@ -50,10 +32,30 @@ paths:
       responses:
         "200":
           description: "desc"
-        "300":
+          schema:
+            $ref: "#/definitions/ReflectionHelper2"
+        "403":
+          description: "desc"
+          schema:
+            $ref: "#/definitions/ErroMensage"
+  /login2/{id}:
+    get:
+      tags:
+      - "Teste"
+      summary: "Loggar com o funcionario"
+      description: "Entrar no sistema"
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "200":
           description: "desc"
           schema:
             $ref: "#/definitions/ReflectionHelper"
+        "300":
+          description: "desc"
 definitions:
   ReflectionHelper:
     type: "object"
@@ -93,3 +95,34 @@ definitions:
       empID:
         type: "integer"
         example: 42
+      teste:
+        type: "array"
+        items: 
+          $ref: "#/definitions/ReflectionHelper3"
+  ReflectionHelper3:
+    type: "object"
+    required:
+    - "age"
+    properties:
+      age:
+        type: "integer"
+        example: 42
+      name:
+        type: "string"
+        example: "Texto de exemplo"
+      deptName:
+        type: "string"
+        example: "Texto de exemplo"
+      empID:
+        type: "integer"
+        example: 42
+  ErroMensage:
+    type: "object"
+    required:
+    properties:
+      code:
+        type: "integer"
+        example: 42
+      mensage:
+        type: "string"
+        example: "Texto de exemplo"
