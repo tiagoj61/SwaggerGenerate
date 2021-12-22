@@ -23,6 +23,10 @@ public class ReflectionDemo {
 		docSwagger = SwaggerMethods.readClass(docSwagger);
 		docText = DocMethods.generateHeader(docSwagger, docText);
 		docText.putTextInFile();
-
+//		Reflections reflections = new Reflections("swagger.automate.rest", new SubTypesScanner(false));
+//		Set<Class<? extends Object>> packs = reflections.getSubTypesOf(Object.class).stream()
+//				.collect(Collectors.toSet());
+//		List<Class<? extends Object>> asd = packs.stream().filter(a -> a.getPackageName() == "swagger.automate.rest")
+//				.collect(Collectors.toList());
 	}
 }

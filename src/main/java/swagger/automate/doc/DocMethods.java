@@ -7,7 +7,7 @@ import org.springframework.util.StringUtils;
 
 import swagger.automate.constants.Constants;
 import swagger.automate.doc.bean.DocText;
-import swagger.automate.enumeration.Methods;
+import swagger.automate.enumeration.MethodsEnum;
 import swagger.automate.swagger.bean.DocSwagger;
 import swagger.automate.util.TextUtil;
 import swagger.automate.util.SwitchUtil;
@@ -60,7 +60,7 @@ public class DocMethods {
 			paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("description: \"Entrar no sistema\"")
 					.append("\n");// TODO:
 
-			if (pathData.getMethod() == Methods.POST.name()) {
+			if (pathData.getMethod() == MethodsEnum.POST.name()) {
 				paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("operationId: \""
 						+ docSwagger.getTags().get(pathData.getTagKey()).getName() + pathData.getPath() + "\"")
 						.append("\n");
@@ -80,30 +80,44 @@ public class DocMethods {
 						.append("description: \"Aparelhos bluetooth e senha do funcionario\"").append("\n");
 				paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("required: true").append("\n");
 				paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("schema:").append("\n");
-				// paths.append(TextUtil.replicateString(Constants.SPACE, 5)).append("$ref:
-				// \"#/definitions/"+objects.get(pathData.getConsumesBodyKey())+"\"").append("\n");//
-				// TODO: define the name
-				paths.append(TextUtil.replicateString(Constants.SPACE, 5))
-						.append("$ref: \"#/definitions/"
-								+ docSwagger.getObjects().get(pathData.getProducesBodyKey()).getNome() + "\"")
-						.append("\n");// TODO:
-										// define
-										// the
-										// name
+				if (docSwagger.getObjects().get(pathData.getConsumesBodyKey()).isArray()) {
+					paths.append(TextUtil.replicateString(Constants.SPACE, 5)).append("type: \"array\"").append("\n");
+					paths.append(TextUtil.replicateString(Constants.SPACE, 5)).append("items:").append("\n");
+					paths.append(TextUtil.replicateString(Constants.SPACE, 6))
+							.append("$ref: \"#/definitions/"
+									+ docSwagger.getObjects().get(pathData.getConsumesBodyKey()).getNome() + "\"")
+							.append("\n");// TODO:
+				} else {
+					paths.append(TextUtil.replicateString(Constants.SPACE, 5))
+							.append("$ref: \"#/definitions/"
+									+ docSwagger.getObjects().get(pathData.getProducesBodyKey()).getNome() + "\"")
+							.append("\n");// TODO:
+				}
 			} else {
-
-				paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("parameters:").append("\n");
 				paths.append(TextUtil.replicateString(Constants.SPACE, 3))
-						.append("- in: " + (pathData.getMethod() == "POST" ? "body" : "path") + "").append("\n");
-
-				paths.append(TextUtil.replicateString(Constants.SPACE, 4))
-						.append("name: " + pathData.getPath().toString().substring(
-								pathData.getPath().toString().indexOf("{") + 1,
-								pathData.getPath().toString().indexOf("}")))
+						.append("operationId: \"" + pathData.getPath() + "\"").append("\n");
+				paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("produces:").append("\n");
+				paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("- \"application/json\"")
 						.append("\n");
 
-				paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("required: true").append("\n");
-				paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("type: integer").append("\n");
+				if (pathData.getPath().toString().contains("{")) {
+					paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("parameters:").append("\n");
+					paths.append(TextUtil.replicateString(Constants.SPACE, 3))
+							.append("- in: " + (pathData.getMethod() == "POST" ? "body" : "path") + "").append("\n");
+					paths.append(TextUtil.replicateString(Constants.SPACE, 4))
+							.append("name: " + pathData.getPath().toString().substring(
+									pathData.getPath().toString().indexOf("{") + 1,
+									pathData.getPath().toString().indexOf("}")))
+							.append("\n");
+//					paths.append(TextUtil.replicateString(Constants.SPACE, 4))
+//					.append("name: " + pathData.getPath().toString()).append("\n");
+					paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("required: true").append("\n");
+					paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("type: integer").append("\n");
+				} else {
+					paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("parameters: []").append("\n");
+
+				}
+
 			}
 			paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("responses:").append("\n");
 
@@ -115,7 +129,8 @@ public class DocMethods {
 				if (response.getProducesBodyKey() != -1) {
 					paths.append(TextUtil.replicateString(Constants.SPACE, 5)).append("schema:").append("\n");
 					if (response.isArray()) {
-						paths.append(TextUtil.replicateString(Constants.SPACE, 6)).append("type: \"array\"").append("\n");
+						paths.append(TextUtil.replicateString(Constants.SPACE, 6)).append("type: \"array\"")
+								.append("\n");
 						paths.append(TextUtil.replicateString(Constants.SPACE, 6)).append("items:").append("\n");
 
 						paths.append(TextUtil.replicateString(Constants.SPACE, 7))
@@ -138,7 +153,6 @@ public class DocMethods {
 	}
 
 	private static DocText generateDefinitions(DocSwagger docSwagger, DocText docText) {
-		System.out.println("ultimo:"+docSwagger.getObjects().size());
 		StringBuilder definitions = new StringBuilder("definitions:").append("\n");
 		docSwagger.getObjects().forEach((key, value) -> {
 			definitions.append(TextUtil.replicateString(Constants.SPACE, 1)).append(value.getNome()).append(":")
@@ -147,18 +161,18 @@ public class DocMethods {
 			// the
 			// name
 			definitions.append(TextUtil.replicateString(Constants.SPACE, 2)).append("type: \"object\"").append("\n");// type
-			definitions.append(TextUtil.replicateString(Constants.SPACE, 2)).append("required:").append("\n");// Required
+			if (value.getTuplaInBodies().stream().filter(tuple -> tuple.getRequired() == true).findAny()
+					.orElse(null) != null) {
+				definitions.append(TextUtil.replicateString(Constants.SPACE, 2)).append("required:").append("\n");// Required
 
-			value.getTuplaInBodies().stream().filter(tuple -> tuple.getRequired() == true).collect(Collectors.toList())
-					.forEach(tuple -> {
-						definitions.append(TextUtil.replicateString(Constants.SPACE, 2))
-								.append("- \"" + tuple.getName() + "\"").append("\n");// Required Fields
-					});
+				value.getTuplaInBodies().stream().filter(tuple -> tuple.getRequired() == true)
+						.collect(Collectors.toList()).forEach(tuple -> {
+							definitions.append(TextUtil.replicateString(Constants.SPACE, 2))
+									.append("- \"" + tuple.getName() + "\"").append("\n");// Required Fields
+						});
+			}
 			definitions.append(TextUtil.replicateString(Constants.SPACE, 2)).append("properties:").append("\n");// Properties
-			System.out.println("saide----------------");
-			System.out.println(value.getNome());
 			value.getTuplaInBodies().forEach(tuple -> {
-				System.out.println(tuple.getName());
 				definitions.append(TextUtil.replicateString(Constants.SPACE, 3)).append("" + tuple.getName() + ":")
 						.append("\n");// Fields
 				definitions.append(TextUtil.replicateString(Constants.SPACE, 4)).append("type: ")

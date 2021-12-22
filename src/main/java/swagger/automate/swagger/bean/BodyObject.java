@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BodyObject {
+	private boolean array;
 	private String nome;
 	private Type type;
 	private List<TuplaInBody> tuplaInBodies;
@@ -12,6 +13,14 @@ public class BodyObject {
 	public BodyObject() {
 		super();
 		this.tuplaInBodies = new ArrayList();
+	}
+
+	public boolean isArray() {
+		return array;
+	}
+
+	public void setArray(boolean array) {
+		this.array = array;
 	}
 
 	public String getNome() {

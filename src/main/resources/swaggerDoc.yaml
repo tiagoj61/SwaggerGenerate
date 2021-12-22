@@ -7,10 +7,46 @@ host: "audax.mobi"
 basePath: "/rest/"
 tags:
 - name: "Teste"
-  description: ""
+  description: "Description"
 schemes:
 - "http"
 paths:
+  /listRecipientes:
+    get:
+      tags:
+      - "Teste"
+      summary: "Loggar com o funcionario"
+      description: "Entrar no sistema"
+      operationId: "listRecipientes"
+      produces:
+        - "application/json"
+      parameters: []
+      responses:
+        "400":
+          description: "desc"
+  /receberDadosRecipientes:
+    post:
+      tags:
+      - "Teste"
+      summary: "Loggar com o funcionario"
+      description: "Entrar no sistema"
+      operationId: "TestereceberDadosRecipientes"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Aparelhos bluetooth e senha do funcionario"
+        required: true
+        schema:
+          type: "array"
+          items:
+            $ref: "#/definitions/ReflectionHelper"
+      responses:
+        "200":
+          description: "desc"
   /login:
     post:
       tags:
@@ -28,34 +64,35 @@ paths:
         description: "Aparelhos bluetooth e senha do funcionario"
         required: true
         schema:
-          $ref: "#/definitions/ReflectionHelper"
+          type: "array"
+          items:
+            $ref: "#/definitions/ReflectionHelper"
       responses:
-        "200":
-          description: "desc"
-          schema:
-            $ref: "#/definitions/ReflectionHelper2"
         "403":
           description: "desc"
           schema:
             $ref: "#/definitions/ErroMensage"
-  /login2/{id}:
+  /listDadosRecipiente/{id}:
     get:
       tags:
       - "Teste"
       summary: "Loggar com o funcionario"
       description: "Entrar no sistema"
+      operationId: "listDadosRecipiente/{id}"
+      produces:
+        - "application/json"
       parameters:
       - in: path
         name: id
         required: true
         type: integer
       responses:
+        "400":
+          description: "desc"
         "200":
           description: "desc"
           schema:
-            $ref: "#/definitions/ReflectionHelper"
-        "300":
-          description: "desc"
+            $ref: "#/definitions/ReflectionHelper4"
 definitions:
   ReflectionHelper:
     type: "object"
@@ -118,7 +155,6 @@ definitions:
         example: 42
   ErroMensage:
     type: "object"
-    required:
     properties:
       code:
         type: "integer"
@@ -126,3 +162,20 @@ definitions:
       mensage:
         type: "string"
         example: "Texto de exemplo"
+  ReflectionHelper4:
+    type: "object"
+    required:
+    - "age"
+    properties:
+      age:
+        type: "integer"
+        example: 42
+      name:
+        type: "string"
+        example: "Texto de exemplo"
+      deptName:
+        type: "string"
+        example: "Texto de exemplo"
+      empID:
+        type: "integer"
+        example: 42
