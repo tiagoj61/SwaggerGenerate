@@ -5,15 +5,20 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 
-import swagger.automate.RestTeste;
+import org.reflections.Reflections;
+import org.reflections.scanners.SubTypesScanner;
+
 import swagger.automate.annotation.ReturnsCods;
 import swagger.automate.enumeration.AnnotationEnum;
 import swagger.automate.enumeration.MethodsEnum;
+import swagger.automate.rest.impl.RestTeste;
 import swagger.automate.swagger.bean.BodyObject;
 import swagger.automate.swagger.bean.DocSwagger;
 import swagger.automate.swagger.bean.PathData;
@@ -24,18 +29,24 @@ import swagger.automate.util.SwaggerUtil;
 
 public class SwaggerMethods {
 
-	public static DocSwagger readClass(DocSwagger docSwagger)
+	public static <T> DocSwagger readClass(DocSwagger docSwagger, String packAgeName)
 			throws NoSuchMethodException, SecurityException, ClassNotFoundException {
 
-		Class<RestTeste> ReflectionHelperclass = RestTeste.class;
-
-		Class[] interfaces = ReflectionHelperclass.getInterfaces();
+		Reflections reflections = new Reflections(packAgeName, new SubTypesScanner(false));
+		Set<Class<? extends Object>> packs = reflections.getSubTypesOf(Object.class).stream()
+				.collect(Collectors.toSet());
+		List<Class<? extends Object>> asd = packs.stream().filter(a -> a.getPackageName() == packAgeName)
+				.collect(Collectors.toList());
+		List<Class> interfaces = new ArrayList<Class>();
+		asd.forEach(a -> {
+			interfaces.add(a.getInterfaces()[0]);
+		});
 
 		/*
 		 * Iterate on interfaces
 		 */
-		for (Class declaredInterface : interfaces) {
-			Method[] privateInterfaceMethods = declaredInterface.getMethods();
+		for (int i = 0; i < asd.size(); i++) {
+			Method[] privateInterfaceMethods = interfaces.get(i).getMethods();
 
 			/*
 			 * Iterate on interface methods
@@ -44,7 +55,7 @@ public class SwaggerMethods {
 
 				PathData pathData = new PathData();
 
-				Method implementedMethod = ReflectionHelperclass.getDeclaredMethod(privateInterfaceMethod.getName(),
+				Method implementedMethod = asd.get(i).getDeclaredMethod(privateInterfaceMethod.getName(),
 						privateInterfaceMethod.getParameterTypes());
 				/*
 				 * Read implemented method of interface method

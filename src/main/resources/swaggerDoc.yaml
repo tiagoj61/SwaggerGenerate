@@ -11,42 +11,6 @@ tags:
 schemes:
 - "http"
 paths:
-  /listRecipientes:
-    get:
-      tags:
-      - "Teste"
-      summary: "Loggar com o funcionario"
-      description: "Entrar no sistema"
-      operationId: "listRecipientes"
-      produces:
-        - "application/json"
-      parameters: []
-      responses:
-        "400":
-          description: "desc"
-  /receberDadosRecipientes:
-    post:
-      tags:
-      - "Teste"
-      summary: "Loggar com o funcionario"
-      description: "Entrar no sistema"
-      operationId: "TestereceberDadosRecipientes"
-      consumes:
-      - "application/json"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        description: "Aparelhos bluetooth e senha do funcionario"
-        required: true
-        schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/ReflectionHelper"
-      responses:
-        "200":
-          description: "desc"
   /login:
     post:
       tags:
@@ -64,14 +28,46 @@ paths:
         description: "Aparelhos bluetooth e senha do funcionario"
         required: true
         schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/ReflectionHelper"
+          $ref: "#/definitions/ReflectionHelper2"
       responses:
         "403":
           description: "desc"
           schema:
             $ref: "#/definitions/ErroMensage"
+  /receberDadosRecipientes:
+    post:
+      tags:
+      - "Teste"
+      summary: "Loggar com o funcionario"
+      description: "Entrar no sistema"
+      operationId: "TestereceberDadosRecipientes"
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        description: "Aparelhos bluetooth e senha do funcionario"
+        required: true
+        schema:
+          $ref: "#/definitions/ReflectionHelper"
+      responses:
+        "200":
+          description: "desc"
+  /listRecipientes:
+    get:
+      tags:
+      - "Teste"
+      summary: "Loggar com o funcionario"
+      description: "Entrar no sistema"
+      operationId: "listRecipientes"
+      produces:
+        - "application/json"
+      parameters: []
+      responses:
+        "400":
+          description: "desc"
   /listDadosRecipiente/{id}:
     get:
       tags:

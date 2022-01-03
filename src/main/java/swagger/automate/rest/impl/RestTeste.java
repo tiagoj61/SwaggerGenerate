@@ -1,4 +1,4 @@
-package swagger.automate;
+package swagger.automate.rest.impl;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.springframework.stereotype.Component;
+
+import swagger.automate.ReflectionHelper;
+import swagger.automate.ReflectionHelper4;
+import swagger.automate.rest.RestTesteInterface;
 
 @Component
 @Path("/usuario")
