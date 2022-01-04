@@ -153,17 +153,15 @@ public class SwaggerMethods {
 			if (annotationOfInterface != null) {
 				switch (AnnotationEnum.fromClass(annotationOfInterface.annotationType())) {
 				case TAG:
-					int existsObject = SwaggerUtil.verifyIfTagExists(docSwagger,
+ 					int existsObject = SwaggerUtil.verifyIfTagExists(docSwagger,
 							((swagger.automate.annotation.Tag) annotationOfInterface).value());
-
 					if (existsObject >= 0) {
 
-						pathData.setProducesBodyKey(existsObject);
+						pathData.setTagKey(existsObject);
 						continue;
 					}
 
 					Tag tag = SwaggerUtil.generateTag(annotationOfInterface);
-
 					pathData.setTagKey(docSwagger.getTags().size());
 					docSwagger.getTags().put(docSwagger.getTags().size(), tag);
 					break;
