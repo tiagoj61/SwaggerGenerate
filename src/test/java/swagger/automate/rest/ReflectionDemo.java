@@ -1,4 +1,4 @@
-package swagger.automate;
+package swagger.automate.rest;
 
 import java.io.IOException;
 import java.util.List;

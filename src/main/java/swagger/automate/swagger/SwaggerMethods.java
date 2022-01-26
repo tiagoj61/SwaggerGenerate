@@ -18,7 +18,6 @@ import org.reflections.scanners.SubTypesScanner;
 import swagger.automate.annotation.ReturnsCods;
 import swagger.automate.enumeration.AnnotationEnum;
 import swagger.automate.enumeration.MethodsEnum;
-import swagger.automate.rest.impl.RestTeste;
 import swagger.automate.swagger.bean.BodyObject;
 import swagger.automate.swagger.bean.DocSwagger;
 import swagger.automate.swagger.bean.PathData;
@@ -80,8 +79,11 @@ public class SwaggerMethods {
 		for (Annotation annotationOfImplemented : implementedMethod.getDeclaredAnnotations()) {
 
 			if (annotationOfImplemented != null) {
+				System.out.println(annotationOfImplemented.annotationType());
+				System.out.println(AnnotationEnum.fromClass(annotationOfImplemented.annotationType()));
 				switch (AnnotationEnum.fromClass(annotationOfImplemented.annotationType())) {
 				case PATH:
+					System.out.println(((Path) annotationOfImplemented).value());
 					pathData.setPath(((Path) annotationOfImplemented).value());
 					break;
 				case CONSUMES:
@@ -153,7 +155,7 @@ public class SwaggerMethods {
 			if (annotationOfInterface != null) {
 				switch (AnnotationEnum.fromClass(annotationOfInterface.annotationType())) {
 				case TAG:
- 					int existsObject = SwaggerUtil.verifyIfTagExists(docSwagger,
+					int existsObject = SwaggerUtil.verifyIfTagExists(docSwagger,
 							((swagger.automate.annotation.Tag) annotationOfInterface).value());
 					if (existsObject >= 0) {
 

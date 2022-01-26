@@ -1,10 +1,10 @@
-package swagger.automate;
+package swagger.automate.rest;
 
 import java.util.List;
 
 import swagger.automate.annotation.Requerido;
 
-public class ReflectionHelper4 {
+public class ReflectionHelper3 {
 	@Requerido(true)
 	private int age;
 	private String name;

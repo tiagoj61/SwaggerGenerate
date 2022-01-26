@@ -6,13 +6,47 @@ info:
 host: "audax.mobi"
 basePath: "/rest/"
 tags:
-- name: "Teste"
-  description: "Description"
 - name: "Aasd"
+  description: "Description"
+- name: "Teste"
   description: "Description"
 schemes:
 - "http"
 paths:
+  /listDadosRecipiente/{id}:
+    get:
+      tags:
+      - "Aasd"
+      summary: "Loggar com o funcionario"
+      description: "Entrar no sistema"
+      operationId: "listDadosRecipiente/{id}"
+      produces:
+        - "application/json"
+      parameters:
+      - in: path
+        name: id
+        required: true
+        type: integer
+      responses:
+        "400":
+          description: "desc"
+        "200":
+          description: "desc"
+          schema:
+            $ref: "#/definitions/ReflectionHelper4"
+  /listRecipientes:
+    get:
+      tags:
+      - "Aasd"
+      summary: "Loggar com o funcionario"
+      description: "Entrar no sistema"
+      operationId: "listRecipientes"
+      produces:
+        - "application/json"
+      parameters: []
+      responses:
+        "400":
+          description: "desc"
   /receberDadosRecipientes:
     post:
       tags:
@@ -53,49 +87,30 @@ paths:
         description: "Aparelhos bluetooth e senha do funcionario"
         required: true
         schema:
-          type: "array"
-          items:
-            $ref: "#/definitions/ReflectionHelper"
+          $ref: "#/definitions/ReflectionHelper2"
       responses:
         "403":
           description: "desc"
           schema:
             $ref: "#/definitions/ErroMensage"
-  /listDadosRecipiente/{id}:
-    get:
-      tags:
-      - "Aasd"
-      summary: "Loggar com o funcionario"
-      description: "Entrar no sistema"
-      operationId: "listDadosRecipiente/{id}"
-      produces:
-        - "application/json"
-      parameters:
-      - in: path
-        name: id
-        required: true
-        type: integer
-      responses:
-        "400":
-          description: "desc"
-        "200":
-          description: "desc"
-          schema:
-            $ref: "#/definitions/ReflectionHelper4"
-  /listRecipientes:
-    get:
-      tags:
-      - "Aasd"
-      summary: "Loggar com o funcionario"
-      description: "Entrar no sistema"
-      operationId: "listRecipientes"
-      produces:
-        - "application/json"
-      parameters: []
-      responses:
-        "400":
-          description: "desc"
 definitions:
+  ReflectionHelper4:
+    type: "object"
+    required:
+    - "age"
+    properties:
+      age:
+        type: "integer"
+        example: 42
+      name:
+        type: "string"
+        example: "Texto de exemplo"
+      deptName:
+        type: "string"
+        example: "Texto de exemplo"
+      empID:
+        type: "integer"
+        example: 42
   ReflectionHelper:
     type: "object"
     required:
@@ -164,20 +179,3 @@ definitions:
       mensage:
         type: "string"
         example: "Texto de exemplo"
-  ReflectionHelper4:
-    type: "object"
-    required:
-    - "age"
-    properties:
-      age:
-        type: "integer"
-        example: 42
-      name:
-        type: "string"
-        example: "Texto de exemplo"
-      deptName:
-        type: "string"
-        example: "Texto de exemplo"
-      empID:
-        type: "integer"
-        example: 42

@@ -1,4 +1,4 @@
-package swagger.automate;
+package swagger.automate.rest;
 
 public class ErroMensage {
 	private int code;

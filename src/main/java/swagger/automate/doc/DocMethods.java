@@ -1,16 +1,13 @@
 package swagger.automate.doc;
 
-import java.util.Arrays;
 import java.util.stream.Collectors;
-
-import org.springframework.util.StringUtils;
 
 import swagger.automate.constants.Constants;
 import swagger.automate.doc.bean.DocText;
 import swagger.automate.enumeration.MethodsEnum;
 import swagger.automate.swagger.bean.DocSwagger;
-import swagger.automate.util.TextUtil;
 import swagger.automate.util.SwitchUtil;
+import swagger.automate.util.TextUtil;
 
 public class DocMethods {
 	public static DocText generateHeader(DocSwagger docSwagger, DocText docText) {
@@ -100,7 +97,7 @@ public class DocMethods {
 				paths.append(TextUtil.replicateString(Constants.SPACE, 4)).append("- \"application/json\"")
 						.append("\n");
 
-				if (pathData.getPath().toString().contains("{")) {
+				if (pathData.getPath() != null && pathData.getPath().toString().contains("{")) {
 					paths.append(TextUtil.replicateString(Constants.SPACE, 3)).append("parameters:").append("\n");
 					paths.append(TextUtil.replicateString(Constants.SPACE, 3))
 							.append("- in: " + (pathData.getMethod() == "POST" ? "body" : "path") + "").append("\n");
