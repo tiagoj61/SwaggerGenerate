@@ -1,0 +1,5 @@
+	<dependency>
+			<groupId>tiago</groupId>
+			<artifactId>SwaggerAutomate</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
