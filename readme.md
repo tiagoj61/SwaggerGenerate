@@ -1,5 +1,5 @@
 
-# SwaggerGenerate - Generate a rest doc automatically
+# SwaggerGenerate - Generate a rest doc automatically(Native Java)
 
 <!--- [What is it](#what-is-it)
 
